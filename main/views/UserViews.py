@@ -8,17 +8,21 @@ from ..serializers.UserSerializer import UserAuthSerializer, UserSerializer
 
 
 class UserAuthView(APIView):
-    """Изменить статус авторизованности пользователя"""
+    """Авторизация пользователя"""
     def post(self, request):
-        if auth.get_user(request).is_authenticated:
-            auth.logout(request)
-            return Response({}, status=201)
-
         serializer = UserAuthSerializer(data=request.data)
         serializer.is_valid()
         user = auth.authenticate(username=serializer.data['username'], password=serializer.data['password'])
         auth.login(request, user)
         return Response(serializer.data, status=201)
+
+    """Выход"""
+    def get(self, request):
+        if auth.get_user(request).is_authenticated:
+            auth.logout(request)
+            return Response({}, status=201)
+
+        return Response({}, status=400)
 
 
 class UserDataView(APIView):
