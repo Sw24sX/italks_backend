@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from django.contrib import auth
 
-from ..serializers.UserSerializer import UserAuthSerializer, UserSerializer
+from ..serializers.UserChangeSerializer import UserAuthSerializer, UserChangeSerializer, UserSerializer
 
 
 class UserAuthView(APIView):
@@ -33,7 +33,7 @@ class UserDataView(APIView):
 
     """Создание пользователя"""
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = UserChangeSerializer(data=request.data)
         serializer.is_valid()
         User.objects.create_user(
             username=serializer.data['username'],
