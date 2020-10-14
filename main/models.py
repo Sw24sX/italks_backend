@@ -23,3 +23,14 @@ class Subcategory(models.Model):
 
     def __str__(self):
         return "{}: {}".format(self.category, self.name)
+
+
+class Video(models.Model):
+    name = models.CharField(max_length=100)
+    src = models.CharField(max_length=30, unique=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    subcategory = models.ManyToManyField(Subcategory)
+
+    class Meta:
+        db_table = "Video"
+        # todo возможно есть ошибка в уникальности категории и подкатегории
