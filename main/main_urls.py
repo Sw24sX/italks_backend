@@ -10,7 +10,7 @@ urlpatterns = [
     path('user_data/', UserDataView.as_view()),
 
     path('category/', CategoryView.as_view()),
-    path('subcategory/<int:category_pk>/', SubcategoryView.as_view()),
+    path('category/<int:category_pk>/', SubcategoryView.as_view()),
 
     path('video/<int:video_pk>/', VideoViews.as_view()),  # Подробная информация о видео
     #path('video/create/', VideoCreateView.as_view()),
