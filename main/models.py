@@ -4,6 +4,7 @@ from django.db import models
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     icon = models.ImageField(upload_to='icons/', blank=True)
+    icon_base_64 = models.CharField(max_length=500, null=True)
     objects = models.Manager()
 
     class Meta:
