@@ -32,16 +32,9 @@ class VideoListCategoryView(APIView):
     """Список видео по категории"""
     def get(self, request, category_pk):
         #todo повышение беопасности
+        subcategories = request.query_params.get('subcategories', None)
+        print(subcategories)
+        print(type(subcategories))
         videos = Video.objects.filter(category_id=category_pk)
-        serializer = VideoSerializer(videos, many=True)
-        return Response(serializer.data, status=201)
-
-
-class VideoListSubcategoryView(APIView):
-    """Список видео по подкатегории"""
-    def get(self, request, category_pk, subcategory_pk):
-        #todo повышение беопасности
-        subcategory = Subcategory.objects.filter(pk=subcategory_pk).first()
-        videos = subcategory.video_set.all()
         serializer = VideoSerializer(videos, many=True)
         return Response(serializer.data, status=201)
