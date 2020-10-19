@@ -134,4 +134,5 @@ MEDIA_URL = '/media/'
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
+    'https://web.postman.co'
 )
