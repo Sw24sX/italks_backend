@@ -29,7 +29,7 @@ class Subcategory(models.Model):
 class Video(models.Model):
     name = models.CharField(max_length=100)
     src = models.CharField(max_length=30, unique=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ManyToManyField(Category)
     subcategory = models.ManyToManyField(Subcategory)
 
     class Meta:
