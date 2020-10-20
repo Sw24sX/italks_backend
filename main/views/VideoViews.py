@@ -1,13 +1,17 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import generics, permissions
 
 from ..models import Category, Subcategory, Video
 
-from ..serializers.VideoSerializer import VideoSerializer\
+from ..serializers.VideoSerializer import VideoSerializer
 
 
 class VideoViews(APIView):
     """Информация о видео"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, video_pk):
         video = Video.objects.filter(pk=video_pk).first()
         if video is None:
@@ -19,6 +23,7 @@ class VideoViews(APIView):
 
 class VideoCreateView(APIView):
     """Добавить новое видео"""
+
     def post(self, request):
         serializer = VideoSerializer(data=request.data)
         if not serializer.is_valid():
@@ -30,6 +35,7 @@ class VideoCreateView(APIView):
 
 class VideoListCategoryView(APIView):
     """Список видео по категории"""
+
     def get(self, request, category_pk):
 
         category = Category.objects.filter(pk=category_pk).first()
