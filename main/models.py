@@ -13,7 +13,7 @@ class Category(models.Model):
         return self.name
 
 
-class NameCategoryForSearch(models.Model):
+class CategoryNames(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     objects = models.Manager()
@@ -36,6 +36,18 @@ class Subcategory(models.Model):
 
     def __str__(self):
         return "{}: {}".format(self.category, self.name)
+
+
+class SubcategoryNames(models.Model):
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    objects = models.Manager()
+
+    class Meta:
+        db_table = "Subcategory names"
+
+    def __str__(self):
+        return self.name
 
 
 class Video(models.Model):
