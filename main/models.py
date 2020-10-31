@@ -13,6 +13,18 @@ class Category(models.Model):
         return self.name
 
 
+class NameCategoryForSearch(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    objects = models.Manager()
+
+    class Meta:
+        db_table = "Category names"
+
+    def __str__(self):
+        return self.name
+
+
 class Subcategory(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategory')
@@ -35,3 +47,6 @@ class Video(models.Model):
     class Meta:
         db_table = "Video"
         # todo возможно есть ошибка в уникальности категории и подкатегории
+
+    def __str__(self):
+        return self.name
