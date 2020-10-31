@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 
 from ..models import Category, Subcategory
 
-from ..serializers.CategorySerializer import CategorySerializer, SubcategorySerializer
+from ..serializers.CategorySerializer import CategorySerializer, SubcategorySerializer, CategoryAndSubcategorySerializer
 
 
 class CategoryView(APIView):
@@ -46,3 +46,11 @@ class SubcategoryView(APIView):
 
         serializer.save(category=category)
         return Response(serializer.data, status=201)
+
+
+class SubcategoryAndCategoryView(APIView):
+    """Список категорий и подкатегорий для каждой и категорий"""
+    def get(self, request):
+        categories = Category.objects.all()
+        serializers = CategoryAndSubcategorySerializer(categories, many=True)
+        return Response(serializers.data, status=201)

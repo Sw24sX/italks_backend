@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views.UserViews import UserAuthView, UserView, UserDataView
-from .views.CategoryViews import CategoryView, SubcategoryView
+from .views.CategoryViews import CategoryView, SubcategoryView, SubcategoryAndCategoryView
 from .views.VideoViews import VideoViews, VideoCreateView, VideoListCategoryView
 from .views.TestViews import TestViews
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path('user/', UserView.as_view()),
     path('user_data/', UserDataView.as_view()),
 
+    path('categories_and_subcategories/', SubcategoryAndCategoryView.as_view()),
     path('category/', CategoryView.as_view()),
     path('category/<int:category_pk>/', SubcategoryView.as_view()),
 
