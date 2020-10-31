@@ -7,8 +7,7 @@ from djoser import email
 
 
 class TestViews(APIView):
-    """Тестовый get запрос (отправка письма)"""
+    """Написание поиска"""
     def get(self, request):
-        a = getattr(settings, 'DOMAIN', '')
-        print(a)
+        search_request
         return Response(status=201)
