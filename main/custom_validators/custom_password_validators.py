@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError, FieldDoesNotExist
 from django.utils.translation import gettext as _, ngettext
 from difflib import SequenceMatcher
 import re
+import emoji
 
 
 class CustomMinimumLengthValidator(password_validation.MinimumLengthValidator):
@@ -58,3 +59,18 @@ class CustomUserAttributeSimilarityValidator(password_validation.UserAttributeSi
                         code='password_too_similar',
                         params={'verbose_name': verbose_name},
                     )
+
+
+class EmojiPasswordValidator:
+    """
+    Validate whether the password is alphanumeric.
+    """
+    def validate(self, password, user=None):
+        if bool(emoji.get_emoji_regexp().search(password)):
+            raise ValidationError(
+                _("Пароль содержит эмоджи"),
+                code='password_contains_emoji'
+            )
+
+    def get_help_text(self):
+        return _('Your password can’t contain emoji.')

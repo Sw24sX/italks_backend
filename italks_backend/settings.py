@@ -121,6 +121,9 @@ AUTH_PASSWORD_VALIDATORS = [
         #'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
         'NAME': 'main.custom_validators.custom_password_validators.CustomNumericPasswordValidator',
     },
+    {
+        'NAME': 'main.custom_validators.custom_password_validators.EmojiPasswordValidator',
+    },
 ]
 
 
