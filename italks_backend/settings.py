@@ -99,16 +99,27 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        #'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'main.custom_validators.custom_password_validators.CustomUserAttributeSimilarityValidator',
+        'OPTIONS': {
+            'user_attributes': ('username', 'email'),
+            'max_similarity': 0.7
+        }
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        #'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'main.custom_validators.custom_password_validators.CustomMinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 6,
+        }
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        #'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'main.custom_validators.custom_password_validators.CustomCommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        #'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'main.custom_validators.custom_password_validators.CustomNumericPasswordValidator',
     },
 ]
 
@@ -172,9 +183,15 @@ DJOSER = {
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': 'activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
-    'SERIALIZERS': {},
+    'SERIALIZERS': {
+        'user_create': 'main.serializers.TestSerializer.UserCreateSerializer',
+    },
+
 }
 
+EMAIL = {
+    'password_reset': 'email.password_reset',
+}
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),

@@ -13,7 +13,7 @@ class TestViews(APIView):
         search_request = request.GET.get('query', None)
         if search_request is None:
             return Response(status=400)
-        list_search = search_request.split()
+        list_search = [i.lower() for i in search_request.split()]
         videos_by_category = self._get_videos_by_categories(list_search)
         videos_by_subcategory = self._get_videos_by_subcategories(list_search)
         print("####")
@@ -37,3 +37,6 @@ class TestViews(APIView):
             .distinct()
         videos = Video.objects.filter(subcategory__id__in=subcategories_id).distinct()
         return videos
+
+    def _get_videos_by_name(self, search):
+        pass

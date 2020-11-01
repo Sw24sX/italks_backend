@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 
 from ..serializers.UserSerializer import UserAuthSerializer, UserChangeSerializer, UserSerializer
-from .. import validators
+from .. import custom_validators
 
 
 class UserAuthView(APIView):
@@ -40,9 +40,9 @@ class UserDataView(APIView):
         password = serializer.data['password']
         email = serializer.data['email']
 
-        username_errors = validators.username_validator(username)
-        password_errors = validators.password_validator(password)
-        email_errors = validators.email_validator(email)
+        username_errors = custom_validators.username_validator(username)
+        password_errors = custom_validators.password_validator(password)
+        email_errors = custom_validators.email_validator(email)
 
         if len(username_errors) + len(password_errors) + len(email_errors) == 0:
             User.objects.create_user(
