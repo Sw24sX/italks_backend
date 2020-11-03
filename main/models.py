@@ -3,7 +3,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    icon_base_64 = models.TextField()
+    icon = models.TextField()
     objects = models.Manager()
 
     class Meta:
