@@ -1,16 +1,12 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics, permissions
-from django.core.mail import send_mail
-from django.conf import settings
-from djoser import email
-from ..models import Category, Subcategory, Video, CategoryNames, SubcategoryNames
+
+from ..models import Video, CategoryNames, SubcategoryNames
 from ..serializers.VideoSerializer import VideoSerializer
 
 
-class TestViews(APIView):
-    """Написание поиска"""
-
+class Search(APIView):
+    """Поиск (первая версия)"""
     def get(self, request):
         search_request = request.GET.get('query', None)
         if search_request is None:
@@ -20,10 +16,6 @@ class TestViews(APIView):
         videos_by_subcategory = self._get_videos_by_subcategories(list_search)
         videos_by_name = self._get_videos_by_name(search_request)
         videos = videos_by_category.union(videos_by_subcategory, videos_by_name)
-        print(videos_by_category)
-        #print(videos_by_subcategory)
-        #print(videos_by_name)
-        #print(videos)
         serializer = VideoSerializer(videos, many=True)
         return Response(serializer.data, status=201)
 

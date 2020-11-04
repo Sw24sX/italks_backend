@@ -23,3 +23,5 @@ class CustomUserCreateSerializer(UserCreateSerializer):
             )
 
         return attrs
+
+
