@@ -10,7 +10,6 @@ class User(AbstractUser):
     username = models.CharField(
         _('username'),
         max_length=150,
-        unique=True,
         help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
         validators=[username_validator],
         error_messages={
@@ -18,12 +17,12 @@ class User(AbstractUser):
         },
     )
 
-    EMAIL_FIELD = 'email'
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    email = models.EmailField(_('email address'), blank=True, unique=True)
 
-    #class Meta:
-    #    db_table = "User"
+    EMAIL_FIELD = 'email'
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
     class Meta(AbstractUser.Meta):
         swappable = 'AUTH_USER_MODEL'
 
