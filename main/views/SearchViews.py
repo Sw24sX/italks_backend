@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import permissions
 
 from ..models import Video, CategoryNames, SubcategoryNames
 from ..serializers.VideoSerializer import VideoSerializer
@@ -7,6 +8,9 @@ from ..serializers.VideoSerializer import VideoSerializer
 
 class Search(APIView):
     """Поиск (первая версия)"""
+
+    permission_classes = [permissions.AllowAny]
+
     def get(self, request):
         search_request = request.GET.get('query', None)
         if search_request is None:

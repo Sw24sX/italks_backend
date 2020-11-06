@@ -10,7 +10,7 @@ from ..serializers.VideoSerializer import VideoSerializer
 class VideoViews(APIView):
     """Информация о видео"""
 
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request, video_pk):
         video = Video.objects.filter(pk=video_pk).first()
@@ -24,6 +24,8 @@ class VideoViews(APIView):
 class VideoCreateView(APIView):
     """Добавить новое видео"""
 
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request):
         serializer = VideoSerializer(data=request.data)
         if not serializer.is_valid():
@@ -35,6 +37,8 @@ class VideoCreateView(APIView):
 
 class VideoListCategoryView(APIView):
     """Список видео по категории и подкатегории"""
+
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request, category_pk):
 

@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import permissions
 
 from ..models import Category, Subcategory
 
@@ -8,6 +9,9 @@ from ..serializers.CategorySerializer import CategorySerializer, SubcategorySeri
 
 class CategoryView(APIView):
     """Список категорий"""
+
+    permission_classes = [permissions.AllowAny]
+
     def get(self, request):
         categories = Category.objects.all()
         result = CategorySerializer(categories, many=True)
@@ -25,6 +29,9 @@ class CategoryView(APIView):
 
 class SubcategoryView(APIView):
     """Список подкатегорий категории"""
+
+    permission_classes = [permissions.AllowAny]
+
     def get(self, request, category_pk):
         category = Category.objects.filter(pk=category_pk).first()
         if category is None:
@@ -35,6 +42,9 @@ class SubcategoryView(APIView):
         return Response(serializer.data, status=201)
 
     """Создание подкатегории"""
+
+    #permission_classes = [permissions.IsAdminUser]
+
     def post(self, request, category_pk):
         category = Category.objects.filter(pk=category_pk).first()
         if category is None:
@@ -50,6 +60,9 @@ class SubcategoryView(APIView):
 
 class SubcategoryAndCategoryView(APIView):
     """Список категорий и подкатегорий для каждой и категорий"""
+
+    permission_classes = [permissions.AllowAny]
+
     def get(self, request):
         categories = Category.objects.all()
         serializers = CategoryAndSubcategorySerializer(categories, many=True)

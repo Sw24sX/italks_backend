@@ -20,10 +20,6 @@ class TestViews(APIView):
         videos_by_subcategory = self._get_videos_by_subcategories(list_search)
         videos_by_name = self._get_videos_by_name(search_request)
         videos = videos_by_category.union(videos_by_subcategory, videos_by_name)
-        print(videos_by_category)
-        #print(videos_by_subcategory)
-        #print(videos_by_name)
-        #print(videos)
         serializer = VideoSerializer(videos, many=True)
         return Response(serializer.data, status=201)
 
