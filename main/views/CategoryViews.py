@@ -7,7 +7,7 @@ from ..models import Category, Subcategory
 from ..serializers.CategorySerializer import CategorySerializer, SubcategorySerializer, CategoryAndSubcategorySerializer
 
 
-class CategoryView(APIView):
+class CategoryListView(APIView):
     """Список категорий"""
 
     permission_classes = [permissions.AllowAny]
@@ -17,7 +17,12 @@ class CategoryView(APIView):
         result = CategorySerializer(categories, many=True)
         return Response(result.data, status=201)
 
+
+class CategoryCreateView(APIView):
     """Создание категории"""
+
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request):
         serializer = CategorySerializer(data=request.data)
         if not serializer.is_valid():
@@ -27,7 +32,7 @@ class CategoryView(APIView):
         return Response(status=201)
 
 
-class SubcategoryView(APIView):
+class SubcategoryListView(APIView):
     """Список подкатегорий категории"""
 
     permission_classes = [permissions.AllowAny]
@@ -41,9 +46,11 @@ class SubcategoryView(APIView):
         serializer = SubcategorySerializer(subcategories, many=True)
         return Response(serializer.data, status=201)
 
+
+class SubcategoryCreateView(APIView):
     """Создание подкатегории"""
 
-    #permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAdminUser]
 
     def post(self, request, category_pk):
         category = Category.objects.filter(pk=category_pk).first()
