@@ -88,3 +88,12 @@ class Video(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Favourites(models.Model):
+    video = models.ForeignKey(Video, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "Favorites"
+        unique_together = ('video', 'user')
