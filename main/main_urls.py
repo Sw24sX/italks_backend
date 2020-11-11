@@ -18,7 +18,8 @@ urlpatterns = [
 
     path('search/', SearchViews.Search.as_view()),
 
-    path('favorites/', FavoritesViews.FavoritesListVideosView.as_view()),
+    path('favorites_list/', FavoritesViews.FavoritesListVideosView.as_view()),
+    path('favorites_add/<int:video_id>/', FavoritesViews.AddFavoritesVideoView.as_view()),
 
     path('test/', TestViews.TestViews.as_view()),
 
