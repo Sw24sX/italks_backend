@@ -12,6 +12,7 @@ class TestViews(APIView):
     """Тест"""
 
     def get(self, request):
+        user = request.user
 
-        return Response(serializer.data, status=201)
+        return Response(status=201)
 

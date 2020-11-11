@@ -91,9 +91,21 @@ class Video(models.Model):
 
 
 class Favourites(models.Model):
-    video = models.ForeignKey(Video, on_delete=models.CASCADE)
+    video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='favorite_video')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "Favorites"
         unique_together = ('video', 'user')
+
+
+class UpcomingEvent(models.Model):
+    name = models.CharField(max_length=150)
+    data = models.DateField()
+    url = models.TextField()
+    image = models.ImageField(default='', upload_to='images/', blank=True)
+
+    class Meta:
+        db_table = "Events"
+        unique_together = ('name', 'data')
+
