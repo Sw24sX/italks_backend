@@ -108,4 +108,4 @@ class UpcomingEvent(models.Model):
     class Meta:
         db_table = "Events"
         unique_together = ('name', 'data')
-
+        ordering = ['data']

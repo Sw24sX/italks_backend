@@ -6,6 +6,7 @@ from django.conf import settings
 from djoser import email
 from ..models import Category, Subcategory, Video, CategoryNames, SubcategoryNames
 from ..serializers.VideoSerializer import VideoSerializer
+from ..serializers import TestSerializer
 
 
 class TestViews(APIView):
@@ -13,6 +14,8 @@ class TestViews(APIView):
 
     def get(self, request):
         user = request.user
-
-        return Response(status=201)
+        video = Video.objects.all()
+        #serialized = TestSerializer.TestSerializer(video, instance=user, many=True)
+        serialized = VideoSerializer(instance=video, many=True)
+        return Response(serialized.data, status=201)
 

@@ -25,3 +25,15 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         return attrs
 
 
+class TestSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['IsFavorite'] = True
+        user: User = instance
+        if user.is_active:
+            representation['IsActive'] = True
+        else:
+            representation['IsActive'] = False
+        return representation
+
+

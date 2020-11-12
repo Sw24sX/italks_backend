@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from .views import (CategoryViews, SearchViews, FavoritesViews, UserView, TestViews, VideoViews)
+from .views import (CategoryViews, SearchViews, FavoritesViews, UserView, TestViews, VideoViews, UpcomingEventViews)
 
 
 urlpatterns = [
@@ -20,6 +20,8 @@ urlpatterns = [
 
     path('favorites_list/', FavoritesViews.FavoritesListVideosView.as_view()),
     path('favorites_add/<int:video_id>/', FavoritesViews.AddFavoritesVideoView.as_view()),
+
+    path('events/', UpcomingEventViews.EventListView.as_view()),
 
     path('test/', TestViews.TestViews.as_view()),
 
