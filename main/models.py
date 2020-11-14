@@ -17,7 +17,7 @@ class User(AbstractUser):
         },
     )
 
-    email = models.EmailField(_('email address'), blank=True, unique=True)
+    email = models.EmailField(_('email address'), blank=False, unique=True)
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
