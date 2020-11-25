@@ -25,3 +25,66 @@ VALUES
     (8, 'design-2', 3),
     (9, 'design-3', 3)
     ;
+
+INSERT INTO
+    Conference(id, name)
+VALUES
+    (1, 'Test_Conference'),
+    (2, 'PyCon 2020')
+    ;
+
+INSERT INTO
+    Resource(id, name)
+VALUES
+    (1, 'YouTube')
+    ;
+
+INSERT INTO
+    Video(id, name, src, conference_id, resource_id)
+VALUES
+    (1, 'Test_video_1', 'svx8GlynIAI', 1, 1),
+    (2, 'Test_video_2', 'vRRlKPiRoqA', 1, 1),
+    (3, 'PyCon 2020. Talk: Harry Percival - Stop Using Mocks (for a while)', 'rk-f3B-eMkI', 2, 1),
+    (4, 'PyCon 2020. Sponsor Workshop: ActiveState - Shaun Lowry - We need to talk about Windows', 'S77ASVUiTdA', 2, 1),
+    (5, 'PyCon 2020. Tutorial: Allison Parrish - Nonsense verse with Python and machine learning', 'yJ6iN5M42sA', 2, 1),
+    (6, 'PyCon 2020. Talk: Colin Carroll - Getting started with automatic differentiation', 'NG21KWZSiok', 2, 1),
+    (7, 'PyCon 2020. Sponsor Workshop: Jason Lantz - Salesforce: How Python Powers Salesforce.orgs Unique Open Source...', 'XL77lRTVF3g', 2, 1),
+    (8, 'PyCon 2020. Talk: Anthony Shaw - Why is Python slow?', 'I4nkgJdVZFA', 2, 1)
+    ;
+
+INSERT INTO
+    Video_category(id, video_id, category_id)
+VALUES
+    (1, 1, 1),
+    (2, 1, 2),
+    (3, 2, 2),
+    (4, 2, 3),
+    (5, 2, 4),
+    (6, 3, 1),
+    (7, 4, 1),
+    (8, 5, 1),
+    (9, 6, 1),
+    (10, 7, 1),
+    (11, 8, 1)
+    ;
+
+INSERT INTO
+    Video_subcategory(id, video_id, subcategory_id)
+VALUES
+    (1, 1, 1),
+    (2, 1, 2),
+    (3, 2, 5),
+    (4, 2, 6),
+    (5, 2, 4),
+    (6, 3, 1),
+    (7, 4, 1),
+    (8, 5, 1),
+    (9, 6, 1),
+    (10, 7, 1),
+    (11, 8, 1),
+    (12, 1, 5),
+    (13, 1, 6),
+    (14, 2, 7),
+    (15, 2, 8),
+    (16, 2, 9)
+    ;

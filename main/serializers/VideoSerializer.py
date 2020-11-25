@@ -4,8 +4,10 @@ from ..models import Video, Category
 
 
 class VideoSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    category = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     subcategory = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    conference = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    resource = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
 
     class Meta:

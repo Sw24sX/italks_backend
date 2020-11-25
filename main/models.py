@@ -76,11 +76,33 @@ class SubcategoryNames(models.Model):
         return self.name
 
 
+class Conference(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = "Conference"
+
+    def __str__(self):
+        return self.name
+
+
+class Resource(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = "Resource"
+
+    def __str__(self):
+        return self.name
+
+
 class Video(models.Model):
     name = models.CharField(max_length=100)
     src = models.CharField(max_length=30, unique=True)
     category = models.ManyToManyField(Category)
     subcategory = models.ManyToManyField(Subcategory)
+    conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "Video"
