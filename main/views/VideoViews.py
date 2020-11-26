@@ -1,3 +1,5 @@
+from datetime import datetime, date, timedelta
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
@@ -62,14 +64,33 @@ class VideosViews(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        categories_name = request.query_params.getlist('categories', None)
-        print(categories_name)
-        categories = None
-        if categories_name is not None and len(categories_name) != 0:
-            categories = Category.objects.filter(name__in=categories_name)
-        # TODO сделать пагинацию
-        videos = Video.objects.all()
-        if categories is not None and len(categories) != 0:
-            videos = videos.filter(category__in=categories)
-        serialized = VideoSerializer(videos.distinct(), many=True)
-        return Response(serialized.data, status=201)
+
+        current_week_videos = Video.objects.filter(date__gte=self.get_date_start_week())
+        serialized_current_week_videos = VideoSerializer(current_week_videos, many=True)
+
+        current_month_videos = Video.objects.filter(date__lt=self.get_date_start_week())\
+            .filter(date__gte=self.get_date_start_current_month())
+        serialized_current_month_videos = VideoSerializer(current_month_videos, many=True)
+
+        current_year_videos = Video.objects.filter(date__lt=self.get_date_start_current_month())\
+            .filter(date__gte=self.get_date_start_current_year())
+        serialized_current_year_videos = VideoSerializer(current_year_videos, many=True)
+
+        return Response({"week": serialized_current_week_videos.data,
+                         "month": serialized_current_month_videos.data,
+                         "year": serialized_current_year_videos.data}, status=201)
+
+    @staticmethod
+    def get_date_start_week():
+        current_date = datetime.now()
+        return current_date - timedelta(days=current_date.weekday())
+
+    @staticmethod
+    def get_date_start_current_month():
+        current_date = datetime.now()
+        return current_date - timedelta(days=current_date.day - 1)
+
+    @staticmethod
+    def get_date_start_current_year():
+        current_date = datetime.now()
+        return date(current_date.year, 1, 1)

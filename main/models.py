@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from .custom_validators.custom_username_validators import CustomUnicodeUsernameValidator
 from django.contrib.auth.models import AbstractUser
@@ -103,6 +105,8 @@ class Video(models.Model):
     subcategory = models.ManyToManyField(Subcategory)
     conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+    duration = models.IntegerField(default=0)
+    date = models.DateField(auto_now_add=True)
 
     class Meta:
         db_table = "Video"
