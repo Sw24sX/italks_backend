@@ -64,21 +64,24 @@ class VideosViews(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
+        # todo добавить сортировку
+        period = request.query_params.get('period')
+        print(period)
+        if period == "year":
+            current_year_videos = Video.objects.filter(date__lt=self.get_date_start_current_month()) \
+                .filter(date__gte=self.get_date_start_current_year())
+            serialized_result = VideoSerializer(current_year_videos, many=True)
+        elif period == "month":
+            current_month_videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
+                .filter(date__gte=self.get_date_start_current_month())
+            serialized_result = VideoSerializer(current_month_videos, many=True)
+        elif period == "week":
+            current_week_videos = Video.objects.filter(date__gte=self.get_date_start_week())
+            serialized_result = VideoSerializer(current_week_videos, many=True)
+        else:
+            return Response(status=400)
 
-        current_week_videos = Video.objects.filter(date__gte=self.get_date_start_week())
-        serialized_current_week_videos = VideoSerializer(current_week_videos, many=True)
-
-        current_month_videos = Video.objects.filter(date__lt=self.get_date_start_week())\
-            .filter(date__gte=self.get_date_start_current_month())
-        serialized_current_month_videos = VideoSerializer(current_month_videos, many=True)
-
-        current_year_videos = Video.objects.filter(date__lt=self.get_date_start_current_month())\
-            .filter(date__gte=self.get_date_start_current_year())
-        serialized_current_year_videos = VideoSerializer(current_year_videos, many=True)
-
-        return Response({"week": serialized_current_week_videos.data,
-                         "month": serialized_current_month_videos.data,
-                         "year": serialized_current_year_videos.data}, status=201)
+        return Response(serialized_result.data, status=201)
 
     @staticmethod
     def get_date_start_week():
