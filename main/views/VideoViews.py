@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
 
+from ..service import PaginationVideo, PageNumberPagination
+
 from ..models import Category, Subcategory, Video
 
 from ..serializers.VideoSerializer import VideoSerializer
@@ -58,29 +60,37 @@ class VideoListCategoryView(APIView):
         serializer = VideoSerializer(videos.distinct(), many=True)
         return Response(serializer.data, status=201)
 
+
+from django.core.paginator import Paginator
+
+
 class VideosViews(APIView):
     """Видео на главной"""
 
     permission_classes = [permissions.AllowAny]
+    #pagination_class = PaginationVideo
 
     def get(self, request):
         # todo добавить сортировку
         period = request.query_params.get('period')
-        print(period)
         if period == "year":
-            current_year_videos = Video.objects.filter(date__lt=self.get_date_start_current_month()) \
+            videos = Video.objects.filter(date__lt=self.get_date_start_current_month()) \
                 .filter(date__gte=self.get_date_start_current_year())
-            serialized_result = VideoSerializer(current_year_videos, many=True)
         elif period == "month":
-            current_month_videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
+            videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
                 .filter(date__gte=self.get_date_start_current_month())
-            serialized_result = VideoSerializer(current_month_videos, many=True)
         elif period == "week":
-            current_week_videos = Video.objects.filter(date__gte=self.get_date_start_week())
-            serialized_result = VideoSerializer(current_week_videos, many=True)
+            videos = Video.objects.filter(date__gte=self.get_date_start_week())
         else:
             return Response(status=400)
 
+        # todo добавить обработку исключений
+        page_size = request.query_params.get('page_size')
+        paginator = Paginator(videos, page_size)
+        page = request.query_params.get('page')
+        videos = paginator.page(page)
+
+        serialized_result = VideoSerializer(videos, many=True)
         return Response(serialized_result.data, status=201)
 
     @staticmethod
