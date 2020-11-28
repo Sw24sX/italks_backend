@@ -4,8 +4,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
 
-from ..service import PaginationVideo, PageNumberPagination
-
 from ..models import Category, Subcategory, Video
 
 from ..serializers.VideoSerializer import VideoSerializer
@@ -62,7 +60,7 @@ class VideoListCategoryView(APIView):
 
 
 from django.core.paginator import Paginator
-
+from django.core.paginator import EmptyPage
 
 class VideosViews(APIView):
     """Видео на главной"""
@@ -85,13 +83,24 @@ class VideosViews(APIView):
             return Response(status=400)
 
         # todo добавить обработку исключений
-        page_size = request.query_params.get('page_size')
+        #page_size = request.query_params.get('page_size')
+        page_size = 1
         paginator = Paginator(videos, page_size)
         page = request.query_params.get('page')
-        videos = paginator.page(page)
+        try:
+            videos = paginator.page(page)
+        except EmptyPage:
+            return Response(status=400)
+        except:
+            return Response(status=400)
 
         serialized_result = VideoSerializer(videos, many=True)
-        return Response(serialized_result.data, status=201)
+        data = {
+            "is_last_page": int(page) == paginator.count,
+            "number_pages": paginator.count,
+            "videos_page": serialized_result.data
+        }
+        return Response(data, status=201)
 
     @staticmethod
     def get_date_start_week():
