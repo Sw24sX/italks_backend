@@ -93,11 +93,12 @@ class VideosViews(APIView):
             return Response(status=400)
         except:
             return Response(status=400)
-
+        print(paginator.num_pages)
+        print(paginator.count)
         serialized_result = VideoSerializer(videos, many=True)
         data = {
-            "is_last_page": int(page) == paginator.count,
-            "number_pages": paginator.count,
+            "is_last_page": int(page) == paginator.num_pages,
+            "number_pages": paginator.num_pages,
             "videos_page": serialized_result.data
         }
         return Response(data, status=201)
