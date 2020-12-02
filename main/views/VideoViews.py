@@ -91,7 +91,7 @@ class VideosViews(APIView):
 
         # todo добавить обработку исключений
         #page_size = request.query_params.get('page_size')
-        page_size = 5
+        page_size = 10
         paginator = Paginator(videos, page_size)
         page = request.query_params.get('page')
         try:
