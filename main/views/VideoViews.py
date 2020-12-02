@@ -72,19 +72,26 @@ class VideosViews(APIView):
         # todo добавить сортировку
         period = request.query_params.get('period')
         if period == "year":
-            videos = Video.objects.filter(date__lt=self.get_date_start_current_month()) \
-                .filter(date__gte=self.get_date_start_current_year())
+            # ONLY FOR DEV
+            pk_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            videos = Video.objects.filter(pk__in=pk_list)
+            #videos = Video.objects.filter(date__lt=self.get_date_start_current_month()) \
+            #    .filter(date__gte=self.get_date_start_current_year())
         elif period == "month":
-            videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
-                .filter(date__gte=self.get_date_start_current_month())
+            pk_list = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+            videos = Video.objects.filter(pk__in=pk_list)
+            #videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
+            #    .filter(date__gte=self.get_date_start_current_month())
         elif period == "week":
-            videos = Video.objects.filter(date__gte=self.get_date_start_week())
+            pk_list = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+            videos = Video.objects.filter(pk__in=pk_list)
+            #videos = Video.objects.filter(date__gte=self.get_date_start_week())
         else:
             return Response(status=400)
 
         # todo добавить обработку исключений
         #page_size = request.query_params.get('page_size')
-        page_size = 16
+        page_size = 5
         paginator = Paginator(videos, page_size)
         page = request.query_params.get('page')
         try:
@@ -93,8 +100,6 @@ class VideosViews(APIView):
             return Response(status=400)
         except:
             return Response(status=400)
-        print(paginator.num_pages)
-        print(paginator.count)
         serialized_result = VideoSerializer(videos, many=True)
         data = {
             "is_last_page": int(page) == paginator.num_pages,
