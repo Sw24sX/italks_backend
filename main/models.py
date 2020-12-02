@@ -80,6 +80,7 @@ class SubcategoryNames(models.Model):
 
 class Resource(models.Model):
     name = models.CharField(max_length=100)
+    src = models.TextField()
 
     class Meta:
         db_table = "Resource"
