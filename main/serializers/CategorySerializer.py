@@ -10,11 +10,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class SubcategorySerializer(serializers.ModelSerializer):
-    #category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    category_id = serializers.SlugRelatedField(slug_field='id', read_only=True, source='category')
+    #category_id = serializers.IntegerField(source='category')
 
     class Meta:
         model = Subcategory
-        fields = "__all__"
+        fields = ('id', 'name', 'category_id')
 
 
 class SubcategoriesSerializer(serializers.ModelSerializer):
