@@ -74,3 +74,13 @@ class SubcategoryAndCategoryView(APIView):
         categories = Category.objects.all()
         serializers = CategoryAndSubcategorySerializer(categories, many=True)
         return Response(serializers.data, status=201)
+
+
+class UserSubcategories(APIView):
+    """Список любимых подкатегорий пользователя"""
+
+    def get(self, request):
+        #todo сделать список любимых подкатегорий пользователя. Если их мало - возвращать смежные категории или рандомные
+        subcategories = Subcategory.objects.all()
+        serialized = SubcategorySerializer(subcategories, many=True)
+        return Response(serialized.data, status=201)

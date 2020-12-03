@@ -9,6 +9,8 @@ urlpatterns = [
     path('category/<int:category_pk>/', CategoryViews.SubcategoryListView.as_view()),
     path('category/<int:category_pk>/create-subcategory/', CategoryViews.SubcategoryCreateView.as_view()),
 
+    path('subcategory/user/', CategoryViews.UserSubcategories.as_view()),
+
     path('video/', VideoViews.VideosViews.as_view()),
     path('video/<int:video_pk>/', VideoViews.VideoViews.as_view()),  # Подробная информация о видео
     #path('video/create/', VideoCreateView.as_view()),
