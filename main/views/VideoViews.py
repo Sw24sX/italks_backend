@@ -89,7 +89,7 @@ class VideosViews(APIView):
         else:
             return Response(status=400)
 
-        # todo добавить обработку исключений
+        # todo добавить обработку исключений; попробовать использовать annotate
         #page_size = request.query_params.get('page_size')
         page_size = 10
         paginator = Paginator(videos, page_size)

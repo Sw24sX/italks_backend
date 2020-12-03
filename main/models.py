@@ -109,6 +109,8 @@ class Video(models.Model):
     duration = models.IntegerField(default=0)
     date = models.DateField(auto_now_add=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    #todo temp
+    is_favorite = models.BooleanField(default=False)
 
     class Meta:
         db_table = "Video"
