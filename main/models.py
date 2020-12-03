@@ -109,7 +109,7 @@ class Video(models.Model):
     duration = models.IntegerField(default=0)
     date = models.DateField(auto_now_add=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    #todo temp
+    #todo temp; добавить веса и сортировку по ним
     is_favorite = models.BooleanField(default=False)
 
     class Meta:

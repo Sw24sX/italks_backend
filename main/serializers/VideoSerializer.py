@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from ..models import Video, Category, Author, Resource
+from ..serializers.CategorySerializer import CategorySerializer, SubcategoriesSerializer
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -16,8 +17,8 @@ class ResourceSerializer(serializers.ModelSerializer):
 
 
 class VideoSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
-    subcategory = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    category = CategorySerializer(many=True)
+    subcategory = SubcategoriesSerializer(many=True)
     conference = serializers.SlugRelatedField(slug_field='name', read_only=True)
     resource = ResourceSerializer()
     author = AuthorSerializer()

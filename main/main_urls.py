@@ -5,7 +5,6 @@ from .views import (CategoryViews, SearchViews, FavoritesViews, UserView, TestVi
 
 urlpatterns = [
     path('categories_and_subcategories/', CategoryViews.SubcategoryAndCategoryView.as_view()),
-    path('category/', CategoryViews.CategoryListView.as_view()),
     path('category/', CategoryViews.CategoryCreateView.as_view()),
     path('category/<int:category_pk>/', CategoryViews.SubcategoryListView.as_view()),
     path('category/<int:category_pk>/create-subcategory/', CategoryViews.SubcategoryCreateView.as_view()),
