@@ -10,7 +10,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class SubcategorySerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    #category = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
         model = Subcategory
