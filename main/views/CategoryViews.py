@@ -42,7 +42,7 @@ class SubcategoryListView(APIView):
         if category is None:
             return Response(status=400)
 
-        subcategories = category.subcategory_set.all()
+        subcategories = Subcategory.objects.filter(category=category)
         serializer = SubcategorySerializer(subcategories, many=True)
         return Response(serializer.data, status=201)
 
