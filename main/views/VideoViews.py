@@ -112,7 +112,6 @@ class VideosViews(APIView):
         }
         return Response(data, status=201)
 
-
     @staticmethod
     def get_videos_by_period(period: str):
         if period == "year":
@@ -128,7 +127,7 @@ class VideosViews(APIView):
             #    .filter(date__gte=self.get_date_start_current_month())
         elif period == "week":
             pk_list = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
-            videos = Video.objects.filter(pk__in=pk_list)
+            videos = Video.objects.all()
             #videos = Video.objects.filter(date__gte=self.get_date_start_week())
         else:
             return None
