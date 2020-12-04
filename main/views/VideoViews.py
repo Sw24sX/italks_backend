@@ -48,39 +48,15 @@ class VideoListCategoryView(APIView):
     def get(self, request, category_pk):
         # todo добавить сортировку
         period = request.query_params.get('period')
-
-        #category = Category.objects.filter(pk=category_pk).first()
-        #if category is None:
-        #    return Response(status=400)
-
         subcategory_id = request.query_params.get('subcategory')
 
-        if period == "year":
-            # ONLY FOR DEV
-            pk_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            videos = Video.objects.filter(pk__in=pk_list, category__id=category_pk)
-            if subcategory_id is not None:
-                videos = videos.filter(subcategory__id=subcategory_id)
-
-            #videos = Video.objects.filter(date__lt=self.get_date_start_current_month()) \
-            #    .filter(date__gte=self.get_date_start_current_year())
-        elif period == "month":
-            pk_list = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-            videos = Video.objects.filter(pk__in=pk_list, category__id=category_pk)
-
-            if subcategory_id is not None:
-                videos = videos.filter(subcategory__id=subcategory_id)
-            #videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
-            #    .filter(date__gte=self.get_date_start_current_month())
-        elif period == "week":
-            pk_list = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
-            videos = Video.objects.filter(pk__in=pk_list, category__id=category_pk)
-
-            if subcategory_id is not None:
-                videos = videos.filter(subcategory__id=subcategory_id)
-            #videos = Video.objects.filter(date__gte=self.get_date_start_week())
-        else:
+        videos = VideosViews.get_videos_by_period(period)
+        if videos is None:
             return Response(status=400)
+
+        videos = videos.filter(category__id=category_pk)
+        if subcategory_id is not None:
+            videos = videos.filter(subcategory__id=subcategory_id)
 
         # todo добавить обработку исключений; попробовать использовать annotate
         #page_size = request.query_params.get('page_size')
@@ -93,6 +69,7 @@ class VideoListCategoryView(APIView):
             return Response(status=400)
         except:
             return Response(status=400)
+
         serialized_result = VideoSerializer(videos, many=True)
         data = {
             "is_last_page": int(page) == paginator.num_pages,
@@ -112,22 +89,8 @@ class VideosViews(APIView):
     def get(self, request):
         # todo добавить сортировку
         period = request.query_params.get('period')
-        if period == "year":
-            # ONLY FOR DEV
-            pk_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            videos = Video.objects.filter(pk__in=pk_list)
-            #videos = Video.objects.filter(date__lt=self.get_date_start_current_month()) \
-            #    .filter(date__gte=self.get_date_start_current_year())
-        elif period == "month":
-            pk_list = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-            videos = Video.objects.filter(pk__in=pk_list)
-            #videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
-            #    .filter(date__gte=self.get_date_start_current_month())
-        elif period == "week":
-            pk_list = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
-            videos = Video.objects.filter(pk__in=pk_list)
-            #videos = Video.objects.filter(date__gte=self.get_date_start_week())
-        else:
+        videos = self.get_videos_by_period(period)
+        if videos is None:
             return Response(status=400)
 
         # todo добавить обработку исключений; попробовать использовать annotate
@@ -148,6 +111,28 @@ class VideosViews(APIView):
             "videos_page": serialized_result.data
         }
         return Response(data, status=201)
+
+
+    @staticmethod
+    def get_videos_by_period(period: str):
+        if period == "year":
+            # ONLY FOR DEV
+            pk_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            videos = Video.objects.filter(pk__in=pk_list)
+            #videos = Video.objects.filter(date__lt=self.get_date_start_current_month()) \
+            #    .filter(date__gte=self.get_date_start_current_year())
+        elif period == "month":
+            pk_list = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+            videos = Video.objects.filter(pk__in=pk_list)
+            #videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
+            #    .filter(date__gte=self.get_date_start_current_month())
+        elif period == "week":
+            pk_list = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+            videos = Video.objects.filter(pk__in=pk_list)
+            #videos = Video.objects.filter(date__gte=self.get_date_start_week())
+        else:
+            return None
+        return videos
 
     @staticmethod
     def get_date_start_week():
