@@ -40,7 +40,7 @@ VALUES
     ;
 
 INSERT INTO
-    Video(id, name, src, conference_id, resource_id, duration, date)
+    Video(id, name, src, resource_id, duration, date, author_id)
 VALUES
     (1, 'Test_video_1', 'svx8GlynIAI', 1, 1, 100),
     (2, 'Test_video_2', 'vRRlKPiRoqA', 1, 1, 1000),
@@ -68,7 +68,68 @@ VALUES
     (28, 'test_video_28', 'MJmSte679Vc', 1, 1, 42, 2020-11-11),
     (29, 'test_video_29', 'B6oRm_eDtew', 1, 1, 28, 2020-11-11),
     (30, 'test_video_30', 'L8esnMiTWwo', 1, 1, 14, 2020-11-11)
-    ;
+
+(31, 'Test_video_1', 'svx8GlynIAI', 1, 5091, 2020-11-11, 2),
+(32, 'Test_video_2', 'vRRlKPiRoqA', 1, 3356, 2020-11-11, 2),
+(33, 'Talk: Harry Percival - Stop Using Mocks (for a while)', 'rk-f3B-eMkI', 1, 1462, 2020-11-11, 1),
+(34, 'Sponsor Workshop: ActiveState - Shaun Lowry - We need to talk about Windows', 'S77ASVUiTdA', 1, 796, 2020-11-11, 1),
+(35, 'Tutorial: Allison Parrish - Nonsense verse with Python and machine learning', 'yJ6iN5M42sA', 1, 4310, 2020-11-11, 1),
+(36, 'Talk: Colin Carroll - Getting started with automatic differentiation', 'NG21KWZSiok', 1, 8452, 2020-11-11, 1),
+(37, 'Sponsor Workshop: Jason Lantz - Salesforce: How Python Powers Salesforce.orgs Unique Open Source...', 'XL77lRTVF3g', 1, 8194, 2020-11-11, 1),
+(38, 'Talk: Anthony Shaw - Why is Python slow?', 'I4nkgJdVZFA', 1, 2351, 2020-11-11, 1),
+(39, 'Test_video_3', 'a1jJgkH1L5M', 1, 9506, 2020-11-11, 2),
+(40, 'NameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameName', 'iVaqAvlEUbw', 1, 4169, 2020-11-11, 1),
+(41, 'Test_video_4', 'VhWwLLpBuIE', 1, 942, 2020-11-11, 2),
+(42, 'Test_video_5', 'EPrfRu-JPaI', 1, 7711, 2020-11-11, 2),
+(43, '_ameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameName', 'nmYPbCwbhjs', 1, 6104, 2020-11-11, 1),
+(44, 'test_video_14', 'wIq65GZrvLg', 1, 3454, 2020-11-11, 2),
+(45, 'test_video_15', 'F9Q0Rz4rh5c', 1, 1724, 2020-11-11, 2),
+(46, 'test_video_16', 'py0oJxg9PHI', 1, 2685, 2020-11-11, 2),
+(47, 'test_video_17', '23k2H3QTAT4', 1, 6959, 2020-11-11, 2),
+(48, 'test_video_18', 'uzcTE2zDU5s', 1, 8652, 2020-11-11, 2),
+(49, 'test_video_19', 'QU1otSvJZ7g', 1, 4827, 2020-11-11, 1),
+(50, 'test_video_20', 'r-1AND3uE5o', 1, 3273, 2020-11-11, 1),
+(51, 'test_video_21', 'nSMjQN6KkT4', 1, 4969, 2020-11-11, 2),
+(52, 'test_video_22', 'rt7Xc1YUfXw', 1, 9130, 2020-11-11, 1),
+(53, 'test_video_23', 'Wk4Iq2g1Ss8', 1, 4988, 2020-11-11, 1),
+(54, 'test_video_24', 'Q9I8nK40DV0', 1, 3757, 2020-11-11, 1),
+(55, 'test_video_25', 'EHGJuSERX9o', 1, 7188, 2020-11-11, 2),
+(56, 'test_video_26', 'vUDchwIQJm4', 1, 2952, 2020-11-11, 1),
+(57, 'test_video_27', 'TUWWMz6z2To', 1, 580, 2020-11-11, 2),
+(58, 'test_video_28', 'MJmSte679Vc', 1, 7565, 2020-11-11, 2),
+(59, 'test_video_29', 'B6oRm_eDtew', 1, 1357, 2020-11-11, 2),
+(60, 'test_video_30', 'L8esnMiTWwo', 1, 3983, 2020-11-11, 1),
+(61, 'Test_video_1', 'svx8GlynIAI', 1, 2781, 2020-11-11, 2),
+(62, 'Test_video_2', 'vRRlKPiRoqA', 1, 7407, 2020-11-11, 2),
+(63, 'Talk: Harry Percival - Stop Using Mocks (for a while)', 'rk-f3B-eMkI', 1, 4474, 2020-11-11, 1),
+(64, 'Sponsor Workshop: ActiveState - Shaun Lowry - We need to talk about Windows', 'S77ASVUiTdA', 1, 4837, 2020-11-11, 1),
+(65, 'Tutorial: Allison Parrish - Nonsense verse with Python and machine learning', 'yJ6iN5M42sA', 1, 7861, 2020-11-11, 1),
+(66, 'Talk: Colin Carroll - Getting started with automatic differentiation', 'NG21KWZSiok', 1, 9239, 2020-11-11, 1),
+(67, 'Sponsor Workshop: Jason Lantz - Salesforce: How Python Powers Salesforce.orgs Unique Open Source...', 'XL77lRTVF3g', 1, 3073, 2020-11-11, 1),
+(68, 'Talk: Anthony Shaw - Why is Python slow?', 'I4nkgJdVZFA', 1, 6214, 2020-11-11, 1),
+(69, 'Test_video_3', 'a1jJgkH1L5M', 1, 4796, 2020-11-11, 2),
+(70, 'NameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameName', 'iVaqAvlEUbw', 1, 3555, 2020-11-11, 1),
+(71, 'Test_video_4', 'VhWwLLpBuIE', 1, 228, 2020-11-11, 2),
+(72, 'Test_video_5', 'EPrfRu-JPaI', 1, 4978, 2020-11-11, 2),
+(73, '_ameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameNameName', 'nmYPbCwbhjs', 1, 1960, 2020-11-11, 1),
+(74, 'test_video_14', 'wIq65GZrvLg', 1, 2082, 2020-11-11, 2),
+(75, 'test_video_15', 'F9Q0Rz4rh5c', 1, 4034, 2020-11-11, 2),
+(76, 'test_video_16', 'py0oJxg9PHI', 1, 4510, 2020-11-11, 2),
+(77, 'test_video_17', '23k2H3QTAT4', 1, 110, 2020-11-11, 2),
+(78, 'test_video_18', 'uzcTE2zDU5s', 1, 1733, 2020-11-11, 2),
+(79, 'test_video_19', 'QU1otSvJZ7g', 1, 8159, 2020-11-11, 1),
+(80, 'test_video_20', 'r-1AND3uE5o', 1, 7014, 2020-11-11, 1),
+(81, 'test_video_21', 'nSMjQN6KkT4', 1, 5339, 2020-11-11, 2),
+(82, 'test_video_22', 'rt7Xc1YUfXw', 1, 3464, 2020-11-11, 1),
+(83, 'test_video_23', 'Wk4Iq2g1Ss8', 1, 9603, 2020-11-11, 1),
+(84, 'test_video_24', 'Q9I8nK40DV0', 1, 8850, 2020-11-11, 1),
+(85, 'test_video_25', 'EHGJuSERX9o', 1, 758, 2020-11-11, 2),
+(86, 'test_video_26', 'vUDchwIQJm4', 1, 5639, 2020-11-11, 1),
+(87, 'test_video_27', 'TUWWMz6z2To', 1, 7017, 2020-11-11, 2),
+(88, 'test_video_28', 'MJmSte679Vc', 1, 8401, 2020-11-11, 2),
+(89, 'test_video_29', 'B6oRm_eDtew', 1, 6289, 2020-11-11, 2),
+(90, 'test_video_30', 'L8esnMiTWwo', 1, 8865, 2020-11-11, 1)
+  ;
 
 INSERT INTO
     Video_category(id, video_id, category_id)

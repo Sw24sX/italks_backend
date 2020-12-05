@@ -102,7 +102,7 @@ class Author(models.Model):
 
 class Video(models.Model):
     name = models.CharField(max_length=100)
-    src = models.CharField(max_length=30, unique=True)
+    src = models.CharField(max_length=30) #todo (Временно для удобства разработки) unique=True
     category = models.ManyToManyField(Category)
     subcategory = models.ManyToManyField(Subcategory)
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)

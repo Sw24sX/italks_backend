@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, date
 
+from Tools.scripts.findlinksto import visit
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
@@ -10,33 +11,38 @@ from ..models import Category, Subcategory, Video, CategoryNames, SubcategoryNam
 from ..serializers.VideoSerializer import VideoSerializer
 from ..serializers import TestSerializer
 from django.db.models import Q
+import random
 
 
 class TestViews(APIView):
     """Тест"""
 
     def get(self, request):
-        video_2 = Video.objects.get(pk=2)
-        temp = self.get_date_start_current_month()
-        print(temp)
-        print(video_2.date)
-        current_year_videos = Video.objects.filter(Q(date__gte=self.get_date_start_week()))
-        print(current_year_videos)
-        serialized_current_year_videos = VideoSerializer(current_year_videos, many=True)
-        return Response(serialized_current_year_videos.data, status=201)
+        #self.create_many_videos()
+        #self.fill_videos()
+        a = [i for i in range(1, 122)]
+        print(a)
+        return Response(status=201)
 
-    @staticmethod
-    def get_date_start_week():
-        current_date = datetime.now()
-        return current_date - timedelta(days=current_date.weekday())
+    def fill_videos(self):
+        videos = Video.objects.filter(pk__gte=30)
+        for video in videos:
+            category = Category.objects.filter(pk=random.randint(1, 4)).first()
+            subcategories = category.subcategory.all()
+            video.category.add(category)
+            for j in subcategories:
+                video.subcategory.add(j)
 
-    @staticmethod
-    def get_date_start_current_month():
-        current_date = datetime.now()
-        return current_date - timedelta(days=current_date.day - 2)
-
-    @staticmethod
-    def get_date_start_current_year():
-        current_date = datetime.now()
-        return date(current_date.year, 1, 1)
-
+    def create_many_videos(self):
+        videos = Video.objects.all()
+        for video in videos:
+            new_video = Video.objects.create(
+                name=video.name,
+                src=video.src,
+                author=video.author,
+                is_favorite=video.is_favorite,
+                duration=video.duration,
+                date=video.date,
+                resource=video.resource
+            )
+            new_video.save()

@@ -126,7 +126,7 @@ class VideosViews(APIView):
             #videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
             #    .filter(date__gte=self.get_date_start_current_month())
         elif period == "week":
-            pk_list = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+            #pk_list = [i for i in range(1, 122)]
             videos = Video.objects.all()
             #videos = Video.objects.filter(date__gte=self.get_date_start_week())
         else:
