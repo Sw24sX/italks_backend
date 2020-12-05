@@ -60,15 +60,9 @@ class VideoListCategoryView(APIView):
 
         # todo добавить обработку исключений; попробовать использовать annotate
         #page_size = request.query_params.get('page_size')
-        page_size = 60
-        paginator = Paginator(videos, page_size)
+
         page = request.query_params.get('page')
-        try:
-            videos = paginator.page(page)
-        except EmptyPage:
-            return Response(status=400)
-        except:
-            return Response(status=400)
+        videos, paginator = VideosViews.get_videos_page(videos, page)
 
         serialized_result = VideoSerializer(videos, many=True)
         data = {
@@ -94,16 +88,11 @@ class VideosViews(APIView):
             return Response(status=400)
 
         # todo добавить обработку исключений; попробовать использовать annotate
-        #page_size = request.query_params.get('page_size')
-        page_size = 60
-        paginator = Paginator(videos, page_size)
         page = request.query_params.get('page')
-        try:
-            videos = paginator.page(page)
-        except EmptyPage:
+        videos, paginator = self.get_videos_page(videos, page)
+        if videos is None:
             return Response(status=400)
-        except:
-            return Response(status=400)
+
         serialized_result = VideoSerializer(videos, many=True)
         data = {
             "is_last_page": int(page) == paginator.num_pages,
@@ -111,6 +100,19 @@ class VideosViews(APIView):
             "videos_page": serialized_result.data
         }
         return Response(data, status=201)
+
+    @staticmethod
+    def get_videos_page(videos, page: int):
+        page_size = 60
+        paginator = Paginator(videos, page_size)
+        try:
+            videos = paginator.page(page)
+        except EmptyPage:
+            return None, paginator
+        except:
+            return None, paginator
+
+        return videos, paginator
 
     @staticmethod
     def get_videos_by_period(period: str):
