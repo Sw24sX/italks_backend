@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import permissions
 
-from ..models import Favourites, Video, User
+from ..models import FavouritesVideos, Video, User
 
 from ..serializers.VideoSerializer import VideoSerializer
 
@@ -15,7 +15,7 @@ class FavoritesListVideosView(APIView):
 
     def get(self, request: Request):
         user = request.user
-        video_id = Favourites.objects.filter(user=user).values_list('id', flat=True)
+        video_id = FavouritesVideos.objects.filter(user=user).values_list('id', flat=True)
         videos = Video.objects.filter(pk__in=video_id)
         serialized = VideoSerializer(videos, many=True)
         return Response(serialized.data, status=201)
@@ -32,7 +32,7 @@ class AddFavoritesVideoView(APIView):
             return Response(status=400)
 
         user = request.user
-        new_favorites = Favourites.objects.create(user=user, video=video)
+        new_favorites = FavouritesVideos.objects.create(user=user, video=video)
         new_favorites.save()
         return Response(status=201)
 

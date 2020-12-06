@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
 
-from ..models import Category, Subcategory, Video
+from ..models import Category, Subcategory, Video, FavoritesCategory
 
 from ..serializers.VideoSerializer import VideoSerializer
 
@@ -73,6 +73,54 @@ class VideoListCategoryView(APIView):
         return Response(data, status=201)
 
 
+class PromoVideoViews(APIView):
+    """Promo videos"""
+
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        category_id = request.query_params.get('category_id')
+        category = None
+        if category_id is not None:
+            category = Category.objects.filter(pk=category_id).first()
+        if category_id is not None and category is None:
+            return Response(status=400)
+
+        page_size = request.query_params.get('page_size')
+        if page_size is None:
+            page_size = 6
+        page = request.query_params.get('page')
+        if page is None:
+            page = 1
+
+        week_videos = VideosViews.get_videos_by_period('week')
+        month_videos = VideosViews.get_videos_by_period('month')
+        year_videos = VideosViews.get_videos_by_period('year')
+
+        if category_id is not None:
+            #todo не работает сортировка по категории
+            week_videos = week_videos.filter(category_id=category_id)
+            month_videos = month_videos.filter(category_id=category_id)
+            year_videos = year_videos.filter(category_id=category_id)
+
+        data = {
+            "week": self.get_serialized_list_videos(week_videos, page, page_size),
+            "month": self.get_serialized_list_videos(month_videos, page, page_size),
+            "year": self.get_serialized_list_videos(year_videos, page, page_size)
+        }
+
+        if category_id is not None:
+            #todo ниже ничего не проверено
+            data['category_name'] = category.name
+            if not request.user.is_anonymous:
+                data['category_is_favorite'] = FavoritesCategory.objects.filter(user=request.user, category=category).exists()
+
+        return Response(data, status=201)
+
+    @staticmethod
+    def get_serialized_list_videos(videos, page, page_size):
+        videos, _ = VideosViews.get_videos_page(videos, page, page_size)
+        return VideoSerializer(videos, many=True).data
 
 class VideosViews(APIView):
     """Видео на главной"""
@@ -102,8 +150,7 @@ class VideosViews(APIView):
         return Response(data, status=201)
 
     @staticmethod
-    def get_videos_page(videos, page: int):
-        page_size = 60
+    def get_videos_page(videos, page: int, page_size=60):
         paginator = Paginator(videos, page_size)
         try:
             videos = paginator.page(page)

@@ -120,13 +120,22 @@ class Video(models.Model):
         return self.name
 
 
-class Favourites(models.Model):
+class FavouritesVideos(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='favorite_video')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = "Favorites"
+        db_table = "FavoritesVideos"
         unique_together = ('video', 'user')
+
+
+class FavoritesCategory(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "FavoritesCategory"
+        unique_together = ('category', 'user')
 
 
 class UpcomingEvent(models.Model):

@@ -15,6 +15,7 @@ urlpatterns = [
     path('video/<int:video_pk>/', VideoViews.VideoViews.as_view()),  # Подробная информация о видео
     #path('video/create/', VideoCreateView.as_view()),
     path('video/sorted/<int:category_pk>/', VideoViews.VideoListCategoryView.as_view()),  # Список видео по категории
+    path('video/promo/', VideoViews.PromoVideoViews.as_view()),
 
     path('auth/check_token/', UserView.CheckToken.as_view()),
 
