@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, date
 
-from Tools.scripts.findlinksto import visit
+#from Tools.scripts.findlinksto import visit
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
