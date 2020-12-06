@@ -1,9 +1,6 @@
 ## italks_backend
 
-Frontend сервер:
-```
-https://github.com/Alllex202/italks-frontend
-```
+Frontend сервер: [ссылка](https://github.com/Alllex202/italks-frontend "https://github.com/Alllex202/italks-frontend")
 
 Установка всех библиотек:
 ```
