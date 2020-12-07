@@ -21,8 +21,10 @@ urlpatterns = [
 
     path('search/', SearchViews.Search.as_view()),
 
-    path('favorites_list/', FavoritesViews.FavoritesListVideosView.as_view()),
-    path('favorites_add/<int:video_id>/', FavoritesViews.AddFavoritesVideoView.as_view()),
+    path('favorites/video/', FavoritesViews.FavoritesListVideosView.as_view()),
+    path('favorites/video/add/<int:video_id>/', FavoritesViews.AddFavoritesVideoView.as_view()),
+    path('favorites/category/', FavoritesViews.FavoritesListCategoryViews.as_view()),
+    path('favorites/category/add/<int:category_id>/', FavoritesViews.FavoritesAddCategoryViews.as_view()),
 
     path('events/', UpcomingEventViews.EventListView.as_view()),
 

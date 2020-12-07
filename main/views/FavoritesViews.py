@@ -3,9 +3,10 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import permissions
 
-from ..models import FavouritesVideos, Video, User
+from ..models import FavouritesVideos, Video, User, FavoritesCategory, Category
 
 from ..serializers.VideoSerializer import VideoSerializer
+from ..serializers.CategorySerializer import CategorySerializer
 
 
 class FavoritesListVideosView(APIView):
@@ -36,3 +37,31 @@ class AddFavoritesVideoView(APIView):
         new_favorites.save()
         return Response(status=201)
 
+
+class FavoritesListCategoryViews(APIView):
+    """Список отслеживаемых категорий"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        categories_list_id = FavoritesCategory.objects.filter(user=user).values_list('category_id', flat=True)
+        categories = Category.objects.filter(pk__in=categories_list_id)
+        serialized = CategorySerializer(categories, many=True)
+        return Response(serialized.data, status=201)
+
+
+class FavoritesAddCategoryViews(APIView):
+    """Добавление категории в отслеживаемое"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, category_id):
+        user = request.user
+        category = Category.objects.filter(pk=category_id).first()
+        if category is None:
+            return Response(status=400)
+
+        new_favorite_category = FavoritesCategory.objects.create(user=user, category=category)
+        new_favorite_category.save()
+        return Response(status=201)
