@@ -98,10 +98,9 @@ class PromoVideoViews(APIView):
         year_videos = VideosViews.get_videos_by_period('year')
 
         if category_id is not None:
-            #todo не работает сортировка по категории
-            week_videos = week_videos.filter(category_id=category_id)
-            month_videos = month_videos.filter(category_id=category_id)
-            year_videos = year_videos.filter(category_id=category_id)
+            week_videos = week_videos.filter(category__id=category_id)
+            month_videos = month_videos.filter(category__id=category_id)
+            year_videos = year_videos.filter(category__id=category_id)
 
         data = {
             "week": self.get_serialized_list_videos(week_videos, page, page_size),
@@ -110,10 +109,8 @@ class PromoVideoViews(APIView):
         }
 
         if category_id is not None:
-            #todo ниже ничего не проверено
             data['category_name'] = category.name
-            if not request.user.is_anonymous:
-                data['category_is_favorite'] = FavoritesCategory.objects.filter(user=request.user, category=category).exists()
+            data['category_is_favorite'] = FavoritesCategory.objects.filter(user=request.user, category=category).exists()
 
         return Response(data, status=201)
 
