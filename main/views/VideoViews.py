@@ -8,8 +8,7 @@ from ..models import Category, Subcategory, Video, FavoritesCategory
 
 from ..serializers.VideoSerializer import VideoSerializer
 
-from django.core.paginator import Paginator
-from django.core.paginator import EmptyPage
+from django.core.paginator import Paginator, EmptyPage
 
 
 class VideoViews(APIView):
