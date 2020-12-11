@@ -45,10 +45,15 @@ class VideoListCategoryView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, category_pk):
-        # todo добавить сортировку
+        # todo сделать сортировку безопасной
+
         period = request.query_params.get('period')
         subcategory_id = request.query_params.get('subcategory')
-
+        order_by = request.query_params.get('order_by')  # name, new_date, old_date, duration
+        if order_by == "new_date":
+            order_by = "-date"
+        elif order_by == "old_date":
+            order_by = "date"
         videos = VideosViews.get_videos_by_period(period)
         if videos is None:
             return Response(status=400)
@@ -56,6 +61,8 @@ class VideoListCategoryView(APIView):
         videos = videos.filter(category__id=category_pk)
         if subcategory_id is not None:
             videos = videos.filter(subcategory__id=subcategory_id)
+        if order_by is not None:
+            videos = videos.order_by(order_by)
 
         # todo добавить обработку исключений; попробовать использовать annotate
         #page_size = request.query_params.get('page_size')
@@ -119,6 +126,7 @@ class PromoVideoViews(APIView):
         videos, _ = VideosViews.get_videos_page(videos, page, page_size)
         return VideoSerializer(videos, many=True).data
 
+
 class VideosViews(APIView):
     """Видео на главной"""
 
@@ -132,11 +140,20 @@ class VideosViews(APIView):
         if videos is None:
             return Response(status=400)
 
+        order_by = request.query_params.get('order_by')  # name, new_date, old_date, duration
+        if order_by == "new_date":
+            order_by = "-date"
+        elif order_by == "old_date":
+            order_by = "date"
+
         # todo добавить обработку исключений; попробовать использовать annotate
         page = request.query_params.get('page')
+        if order_by is not None:
+            videos = videos.order_by(order_by)
         videos, paginator = self.get_videos_page(videos, page)
         if videos is None:
             return Response(status=400)
+
 
         serialized_result = VideoSerializer(videos, many=True)
         data = {
