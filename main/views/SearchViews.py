@@ -31,6 +31,7 @@ class Search(APIView):
         data = {
             "is_last_page": int(page) == paginator.num_pages,
             "number_pages": paginator.num_pages,
+            "count": paginator.count,
             "videos_page": serialized.data
         }
         return Response(data, status=201)
