@@ -25,7 +25,15 @@ class Search(APIView):
         page_size = request.query_params.get('page_size')
         if page_size is None:
             page_size = 60
-        videos, paginator = self.get_videos_page(videos_by_name, page, page_size)
+
+        order_by = request.query_params.get('order_by')  # name, new_date, old_date, duration
+        if order_by == "new_date":
+            order_by = "-date"
+        elif order_by == "old_date":
+            order_by = "date"
+        videos = videos_by_name.order_by(order_by)
+
+        videos, paginator = self.get_videos_page(videos, page, page_size)
 
         serialized = VideoSerializer(videos, many=True)
         data = {
