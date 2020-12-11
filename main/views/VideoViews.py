@@ -109,7 +109,8 @@ class PromoVideoViews(APIView):
 
         if category_id is not None:
             data['category_name'] = category.name
-            data['category_is_favorite'] = FavoritesCategory.objects.filter(user=request.user, category=category).exists()
+            if not request.user.is_anonymous:
+                data['category_is_favorite'] = FavoritesCategory.objects.filter(user=request.user, category=category).exists()
 
         return Response(data, status=201)
 
