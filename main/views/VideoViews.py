@@ -89,8 +89,15 @@ class PromoVideoViews(APIView):
         category = None
         if category_id is not None:
             category = Category.objects.filter(pk=category_id).first()
-        if category_id is not None and category is None:
-            return Response(status=400)
+            if category is None:
+                return Response(status=400)
+
+        subcategory_id = request.query_params.get('subcategory_id')
+        subcategory = None
+        if subcategory_id is not None:
+            subcategory = Subcategory.objects.filter(pk=subcategory_id).first()
+            if subcategory is None:
+                return Response(status=400)
 
         page_size = request.query_params.get('page_size')
         if page_size is None:
@@ -102,6 +109,11 @@ class PromoVideoViews(APIView):
         week_videos = VideosViews.get_videos_by_period('week')
         month_videos = VideosViews.get_videos_by_period('month')
         year_videos = VideosViews.get_videos_by_period('year')
+
+        if subcategory_id is not None:
+            week_videos = week_videos.filter(subcategory__id=subcategory_id)
+            month_videos = month_videos.filter(subcategory__id=subcategory_id)
+            year_videos = year_videos.filter(subcategory__id=subcategory_id)
 
         if category_id is not None:
             week_videos = week_videos.filter(category__id=category_id)
@@ -118,6 +130,9 @@ class PromoVideoViews(APIView):
             data['category_name'] = category.name
             if not request.user.is_anonymous:
                 data['category_is_favorite'] = FavoritesCategory.objects.filter(user=request.user, category=category).exists()
+
+        if subcategory_id is not None:
+            data['subcategory_name'] = subcategory.name
 
         return Response(data, status=201)
 
