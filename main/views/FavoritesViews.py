@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import permissions
+from django.core.paginator import Paginator, EmptyPage
 
 from ..models import FavouritesVideos, Video, User, FavoritesCategory, Category
 
@@ -18,8 +19,38 @@ class FavoritesListVideosView(APIView):
         user = request.user
         video_id = FavouritesVideos.objects.filter(user=user).values_list('id', flat=True)
         videos = Video.objects.filter(pk__in=video_id)
+
+        order_by = request.query_params.get('order_by')  # name, new_date, old_date, duration
+        if order_by == "new_date":
+            order_by = "-date"
+        elif order_by == "old_date":
+            order_by = "date"
+        if order_by is not None:
+            videos = videos.order_by(order_by)
+
+        page = request.query_params.get('page')
+        videos, paginator = self.get_videos_page(videos, page)
+
         serialized = VideoSerializer(videos, many=True)
-        return Response(serialized.data, status=201)
+
+        data = {
+            "is_last_page": int(page) == paginator.num_pages,
+            "number_pages": paginator.num_pages,
+            "videos_page": serialized.data
+        }
+        return Response(data, status=201)
+
+    @staticmethod
+    def get_videos_page(videos, page: int, page_size=60):
+        paginator = Paginator(videos, page_size)
+        try:
+            videos = paginator.page(page)
+        except EmptyPage:
+            return None, paginator
+        except:
+            return None, paginator
+
+        return videos, paginator
 
 
 class AddFavoritesVideoView(APIView):
