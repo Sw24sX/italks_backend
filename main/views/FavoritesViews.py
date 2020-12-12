@@ -30,6 +30,8 @@ class FavoritesListVideosView(APIView):
 
         page = request.query_params.get('page')
         page_size = request.query_params.get('page_size')
+        if page_size is None:
+            page_size = 60
         videos, paginator = self.get_videos_page(videos, page, page_size)
 
         serialized = VideoSerializer(videos, many=True)
