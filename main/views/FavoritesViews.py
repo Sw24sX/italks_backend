@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage
 from ..models import FavouritesVideos, Video, User, FavoritesCategory, Category, Subcategory, FavoritesSubcategory
 
 from ..serializers.VideoSerializer import VideoSerializer
-from ..serializers.CategorySerializer import CategorySerializer
+from ..serializers.CategorySerializer import CategorySerializer, SubcategorySerializer
 
 
 class FavoritesListVideosView(APIView):
@@ -72,16 +72,21 @@ class AddFavoritesVideoView(APIView):
         return Response(status=201)
 
 
-class FavoritesListCategoryViews(APIView):
+class FavoritesListSubcategoryViews(APIView):
     """Список отслеживаемых категорий"""
 
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         user = request.user
+
         categories_list_id = FavoritesCategory.objects.filter(user=user).values_list('category_id', flat=True)
         categories = Category.objects.filter(pk__in=categories_list_id)
-        serialized = CategorySerializer(categories, many=True)
+        serialized_categories = CategorySerializer(categories, many=True)
+
+        subcategories_list_id = FavoritesSubcategory.objects.filter(user=user).values_list('subcategory_id', flat=True)
+        subcategories = Subcategory.objects.filter(pk__in=subcategories_list_id)
+        serialized = SubcategorySerializer(subcategories, many=True)
         return Response(serialized.data, status=201)
 
 
