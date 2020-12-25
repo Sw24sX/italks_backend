@@ -11,7 +11,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class SubcategorySerializer(serializers.ModelSerializer):
     category_id = serializers.SlugRelatedField(slug_field='id', read_only=True, source='category')
-    #category_id = serializers.IntegerField(source='category')
 
     class Meta:
         model = Subcategory
@@ -19,9 +18,12 @@ class SubcategorySerializer(serializers.ModelSerializer):
 
 
 class SubcategoriesSerializer(serializers.ModelSerializer):
+    subcategory_id = serializers.CharField(source='id')
+    category_id = serializers.SlugRelatedField(slug_field='id', read_only=True, source='category')
+
     class Meta:
         model = Subcategory
-        fields = ('id', 'name')
+        fields = ('subcategory_id', 'category_id', 'name')
 
 
 class CategoryAndSubcategorySerializer(serializers.ModelSerializer):

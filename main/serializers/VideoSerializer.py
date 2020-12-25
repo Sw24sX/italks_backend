@@ -23,7 +23,6 @@ class VideoSerializer(serializers.ModelSerializer):
     resource = ResourceSerializer()
     author = AuthorSerializer()
 
-
     class Meta:
         model = Video
         fields = "__all__"

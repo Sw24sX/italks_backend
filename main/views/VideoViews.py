@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
 
-from ..models import Category, Subcategory, Video, FavoritesCategory
+from ..models import Category, Subcategory, Video, FavoritesCategory, FavoritesSubcategory
 
 from ..serializers.VideoSerializer import VideoSerializer
 
@@ -123,17 +123,21 @@ class PromoVideoViews(APIView):
         data = {
             "week": self.get_serialized_list_videos(week_videos, page, page_size),
             "month": self.get_serialized_list_videos(month_videos, page, page_size),
-            "year": self.get_serialized_list_videos(year_videos, page, page_size)
+            "year": self.get_serialized_list_videos(year_videos, page, page_size), 'category_is_favorite': False,
+            'subcategory_is_favorite': False
         }
 
         if category_id is not None:
             data['category_name'] = category.name
             if not request.user.is_anonymous:
-                data['category_is_favorite'] = FavoritesCategory.objects.filter(user=request.user, category=category).exists()
+                data['category_is_favorite'] = FavoritesCategory.objects.filter(user=request.user,
+                                                                                category=category).exists()
 
         if subcategory_id is not None:
             data['subcategory_name'] = subcategory.name
-
+            if not request.user.is_anonymous:
+                data['subcategory_is_favorite'] = FavoritesSubcategory.objects.filter(user=request.user,
+                                                                                      subcategory=subcategory).exists()
         return Response(data, status=201)
 
     @staticmethod
