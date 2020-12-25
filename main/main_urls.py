@@ -24,6 +24,7 @@ urlpatterns = [
     path('favorites/video/', FavoritesViews.FavoritesListVideosView.as_view()),  # Список избранных видео
     path('favorites/video/add/<int:video_id>/', FavoritesViews.AddFavoritesVideoView.as_view()),  # Добавление видео в избранное
     path('favorites/category/', FavoritesViews.FavoritesListCategoryViews.as_view()),  # спиок отслеживаемых категорий
+
     path('favorites/category/add/<int:category_id>/', FavoritesViews.FavoritesAddCategoryViews.as_view()),  # добавление категории в избранное
 
     path('events/', UpcomingEventViews.EventListView.as_view()),

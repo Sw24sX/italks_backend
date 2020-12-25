@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import permissions
 from django.core.paginator import Paginator, EmptyPage
 
-from ..models import FavouritesVideos, Video, User, FavoritesCategory, Category
+from ..models import FavouritesVideos, Video, User, FavoritesCategory, Category, Subcategory, FavoritesSubcategory
 
 from ..serializers.VideoSerializer import VideoSerializer
 from ..serializers.CategorySerializer import CategorySerializer
@@ -98,4 +98,19 @@ class FavoritesAddCategoryViews(APIView):
 
         new_favorite_category = FavoritesCategory.objects.create(user=user, category=category)
         new_favorite_category.save()
+        return Response(status=201)
+
+
+class FavoritesAddSubcategoryView(APIView):
+    """Добавление подкатегории в отслеживаемое"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, subcategory_id):
+        user = request.user
+        subcategory = Subcategory.objects.filter(pk=subcategory_id).first()
+        if subcategory is None:
+            return Response(status=400)
+
+        FavoritesSubcategory.objects.create(user=user, subcategory=subcategory).save()
         return Response(status=201)

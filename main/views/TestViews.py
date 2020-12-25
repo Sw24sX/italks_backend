@@ -18,11 +18,10 @@ class TestViews(APIView):
     """Тест"""
 
     def get(self, request):
-        #self.create_many_videos()
-        #self.fill_videos()
-        a = [i for i in range(1, 122)]
-        print(a)
-        return Response(status=201)
+        pk_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        videos = Video.objects.filter(pk__in=pk_list)
+        result = TestSerializer.TestSerializer(videos, context={'request': request})
+        return Response(result.data, status=201)
 
     def fill_videos(self):
         videos = Video.objects.filter(pk__gte=30)

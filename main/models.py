@@ -138,6 +138,15 @@ class FavoritesCategory(models.Model):
         unique_together = ('category', 'user')
 
 
+class FavoritesSubcategory(models.Model):
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "FavoritesSubcategory"
+        unique_together = ('subcategory', 'user')
+
+
 class UpcomingEvent(models.Model):
     name = models.CharField(max_length=150)
     data = models.DateField()

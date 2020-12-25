@@ -26,8 +26,15 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class TestSerializer(serializers.Serializer):
+    IsFavorite = serializers.BooleanField()
+    IsActive = serializers.BooleanField()
+
     def to_representation(self, instance):
+        request = self.context['request']
         representation = super().to_representation(instance)
+        #representation['request'] = True
+        #if request is None:
+        #    representation['request'] = False
         representation['IsFavorite'] = True
         user: User = instance
         if user.is_active:
