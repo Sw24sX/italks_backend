@@ -35,7 +35,7 @@ class Search(APIView):
 
         videos, paginator = self.get_videos_page(videos, page, page_size)
 
-        serialized = VideoSerializer(videos, many=True)
+        serialized = VideoSerializer(videos, many=True, context={'user': request.user})
         data = {
             "is_last_page": int(page) == paginator.num_pages,
             "number_pages": paginator.num_pages,

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..models import Video, Category, Author, Resource
+from ..models import Video, Category, Author, Resource, FavouritesVideos
 from ..serializers.CategorySerializer import CategorySerializer, SubcategorySerializer
 
 
@@ -22,6 +22,13 @@ class VideoSerializer(serializers.ModelSerializer):
     conference = serializers.SlugRelatedField(slug_field='name', read_only=True)
     resource = ResourceSerializer()
     author = AuthorSerializer()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        user = self.context['user']
+        if not user.is_anonymous:
+            representation['is_favorite'] = FavouritesVideos.objects.filter(user=user, video=instance).exists()
+        return representation
 
     class Meta:
         model = Video

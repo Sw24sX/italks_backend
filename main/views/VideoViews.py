@@ -21,7 +21,7 @@ class VideoViews(APIView):
         if video is None:
             return Response(status=400)
 
-        serializer = VideoSerializer(video)
+        serializer = VideoSerializer(video, context={'user': request.user})
         return Response(serializer.data, status=201)
 
 
@@ -31,7 +31,7 @@ class VideoCreateView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        serializer = VideoSerializer(data=request.data)
+        serializer = VideoSerializer(data=request.data, context={'user': request.user})
         if not serializer.is_valid():
             return Response(status=400)
 
@@ -70,7 +70,7 @@ class VideoListCategoryView(APIView):
         page = request.query_params.get('page')
         videos, paginator = VideosViews.get_videos_page(videos, page)
 
-        serialized_result = VideoSerializer(videos, many=True)
+        serialized_result = VideoSerializer(videos, many=True, context={'user': request.user})
         data = {
             "is_last_page": int(page) == paginator.num_pages,
             "number_pages": paginator.num_pages,
@@ -120,10 +120,11 @@ class PromoVideoViews(APIView):
             month_videos = month_videos.filter(category__id=category_id)
             year_videos = year_videos.filter(category__id=category_id)
 
+        user = request.user
         data = {
-            "week": self.get_serialized_list_videos(week_videos, page, page_size),
-            "month": self.get_serialized_list_videos(month_videos, page, page_size),
-            "year": self.get_serialized_list_videos(year_videos, page, page_size),
+            "week": self.get_serialized_list_videos(week_videos, page, page_size, user),
+            "month": self.get_serialized_list_videos(month_videos, page, page_size, user),
+            "year": self.get_serialized_list_videos(year_videos, page, page_size, user),
             'category_is_favorite': False,
             'subcategory_is_favorite': False
         }
@@ -142,9 +143,9 @@ class PromoVideoViews(APIView):
         return Response(data, status=201)
 
     @staticmethod
-    def get_serialized_list_videos(videos, page, page_size):
+    def get_serialized_list_videos(videos, page, page_size, user):
         videos, _ = VideosViews.get_videos_page(videos, page, page_size)
-        return VideoSerializer(videos, many=True).data
+        return VideoSerializer(videos, many=True, context={'user': user}).data
 
 
 class VideosViews(APIView):
@@ -174,8 +175,7 @@ class VideosViews(APIView):
         if videos is None:
             return Response(status=400)
 
-
-        serialized_result = VideoSerializer(videos, many=True)
+        serialized_result = VideoSerializer(videos, many=True, context={'user': request.user})
         data = {
             "is_last_page": int(page) == paginator.num_pages,
             "number_pages": paginator.num_pages,
