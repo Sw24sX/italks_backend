@@ -123,7 +123,8 @@ class PromoVideoViews(APIView):
         data = {
             "week": self.get_serialized_list_videos(week_videos, page, page_size),
             "month": self.get_serialized_list_videos(month_videos, page, page_size),
-            "year": self.get_serialized_list_videos(year_videos, page, page_size), 'category_is_favorite': False,
+            "year": self.get_serialized_list_videos(year_videos, page, page_size),
+            'category_is_favorite': False,
             'subcategory_is_favorite': False
         }
 
