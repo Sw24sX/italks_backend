@@ -6,6 +6,8 @@ from djoser.conf import settings
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer
 
+from ..models import Author
+
 User = get_user_model()
 
 
@@ -26,17 +28,14 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class TestSerializer(serializers.Serializer):
-    IsFavorite = serializers.BooleanField()
-    IsActive = serializers.BooleanField()
 
     def to_representation(self, instance):
         request = self.context['request']
         representation = super().to_representation(instance)
-        #representation['request'] = True
-        #if request is None:
-        #    representation['request'] = False
         representation['IsFavorite'] = True
-        user: User = instance
+        user = request.user
+        author = Author.objects.get(pk=1)
+        representation['user'] = AuthorSerializer(author).data
         if user.is_active:
             representation['IsActive'] = True
         else:
@@ -44,3 +43,7 @@ class TestSerializer(serializers.Serializer):
         return representation
 
 
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ('name', 'src')

@@ -30,3 +30,4 @@ class VideoSerializer(serializers.ModelSerializer):
 
 class SearchResultSerializer(serializers.Serializer):
     result = VideoSerializer(many=True)
+

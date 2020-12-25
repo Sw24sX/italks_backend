@@ -101,8 +101,18 @@ class FavoritesAddCategoryViews(APIView):
         if category is None:
             return Response(status=400)
 
-        new_favorite_category = FavoritesCategory.objects.create(user=user, category=category)
-        new_favorite_category.save()
+        #TODO Сделать нормальную обработку ошибок
+        try:
+            FavoritesCategory.objects.create(user=user, category=category).save()
+        except:
+            return Response(status=400)
+
+        for subcategory in category.subcategory.all():
+            try:
+                FavoritesSubcategory.objects.create(user=user, subcategory=subcategory).save()
+            except:
+                continue
+
         return Response(status=201)
 
 
@@ -117,5 +127,10 @@ class FavoritesAddSubcategoryView(APIView):
         if subcategory is None:
             return Response(status=400)
 
-        FavoritesSubcategory.objects.create(user=user, subcategory=subcategory).save()
+        # TODO Сделать нормальную обработку ошибок
+        try:
+            FavoritesSubcategory.objects.create(user=user, subcategory=subcategory).save()
+        except:
+            return Response(status=400)
+
         return Response(status=201)
