@@ -28,6 +28,7 @@ urlpatterns = [
     path('favorites/subcategory/', FavoritesViews.FavoritesListSubcategoryViews.as_view()),  # спиок отслеживаемых категорий
     path('favorites/subcategory/add/<int:subcategory_id>/', FavoritesViews.FavoritesAddSubcategoryView.as_view()),
     path('favorites/category/add/<int:category_id>/', FavoritesViews.FavoritesAddCategoryViews.as_view()),  # добавление категории в избранное
+    path('favorites/category/remove/<int:category_id>/', FavoritesViews.FavoritesRemoveCategoryViews.as_view()),  # удаление категорий из избранного
 
     path('events/', UpcomingEventViews.EventListView.as_view()),
 

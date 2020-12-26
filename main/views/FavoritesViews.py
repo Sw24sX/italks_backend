@@ -133,6 +133,24 @@ class FavoritesAddCategoryViews(APIView):
         return Response(status=201)
 
 
+class FavoritesRemoveCategoryViews(APIView):
+    """Удаление категории из избранного"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, category_id):
+        user = request.user
+        favorite_category = FavoritesCategory.objects.filter(category_id=category_id)
+        if favorite_category.first() is None:
+            return Response(status=400)
+
+        favorite_category.delete()
+        favorite_subcategories = FavoritesSubcategory.objects.filter(subcategory__category_id=category_id)
+        favorite_subcategories.delete()
+
+        return Response(status=200)
+
+
 class FavoritesAddSubcategoryView(APIView):
     """Добавление подкатегории в отслеживаемое"""
 
