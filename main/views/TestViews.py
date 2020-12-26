@@ -18,9 +18,12 @@ class TestViews(APIView):
     """Тест"""
 
     def get(self, request):
-        pk_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        videos = Video.objects.filter(pk__in=pk_list)
-        result = TestSerializer.TestSerializer(videos, context={'request': request})
+        pk_list = [1, 2, 3, 5]
+        pk_list_1 = [4, 5, 6]
+        videos_1 = Video.objects.filter(pk__in=pk_list)
+        videos_2 = Video.objects.filter(pk__in=pk_list_1)
+        videos = (videos_2 | videos_1)
+        result = VideoSerializer(videos, many=True, context={'user': request.user})
         return Response(result.data, status=201)
 
     def fill_videos(self):

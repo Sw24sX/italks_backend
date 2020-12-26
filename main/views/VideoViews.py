@@ -181,6 +181,7 @@ class VideosViews(APIView):
             "number_pages": paginator.num_pages,
             "videos_page": serialized_result.data
         }
+        #TODO ЗАМЕНИТЬ НА СТАТУС 200 ВЕСЗДЕ
         return Response(data, status=201)
 
     @staticmethod
@@ -230,3 +231,42 @@ class VideosViews(APIView):
     def get_date_start_current_year():
         current_date = datetime.now()
         return date(current_date.year, 1, 1)
+
+
+class SimilarVideosViews(APIView):
+    """Список похожих видео"""
+
+    def get(self, request, video_id):
+        # todo запоминать данные о видео, его категорию и тд
+        video = Video.objects.filter(pk=video_id).first()
+        if video is None:
+            return Response(status=400)
+
+        page = request.query_params.get('page')
+        if page is None:
+            return Response({'error': "Page not specified"})
+
+        page_size = request.query_params.get('page_size')
+        if page_size is None:
+            page_size = 10
+
+        category = video.category.all()
+        subcategory = video.subcategory.all()
+
+        to_few_videos = 5
+        videos = Video.objects.filter(subcategory__in=subcategory).order_by('-date')
+        videos_count = videos.count()
+        if videos_count < to_few_videos:
+            videos = videos | Video.objects.filter(category__in=category).order_by("-date")
+
+        paginator = Paginator(videos, page_size)
+        videos = paginator.page(page)
+        result = VideoSerializer(videos, many=True, context={'user': request.user})
+
+        data = {
+            "is_last_page": int(page) == paginator.num_pages,
+            "number_pages": paginator.num_pages,
+            "videos_page": result.data
+        }
+
+        return Response(data, status=200)
