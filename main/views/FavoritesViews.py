@@ -81,11 +81,11 @@ class RemoveFavoritesVideoView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request: Request, video_id: int):
-        video = Video.objects.filter(pk=video_id)
+        video = FavouritesVideos.objects.filter(video_id=video_id, user=request.user)
         if video.first() is None:
             return Response(status=400)
 
-        video.remove()
+        video.delete()
         return Response(status=200)
 
 
