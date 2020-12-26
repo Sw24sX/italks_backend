@@ -41,7 +41,7 @@ class FavoritesListVideosView(APIView):
             "number_pages": paginator.num_pages,
             "videos_page": serialized.data
         }
-        return Response(data, status=201)
+        return Response(data, status=200)
 
     @staticmethod
     def get_videos_page(videos, page: int, page_size=60):
@@ -104,7 +104,7 @@ class FavoritesListSubcategoryViews(APIView):
         subcategories_list_id = FavoritesSubcategory.objects.filter(user=user).values_list('subcategory_id', flat=True)
         subcategories = Subcategory.objects.filter(pk__in=subcategories_list_id)
         serialized = SubcategoriesSerializer(subcategories, many=True)
-        return Response(serialized.data, status=201)
+        return Response(serialized.data, status=200)
 
 
 class FavoritesAddCategoryViews(APIView):
@@ -140,12 +140,12 @@ class FavoritesRemoveCategoryViews(APIView):
 
     def post(self, request, category_id):
         user = request.user
-        favorite_category = FavoritesCategory.objects.filter(category_id=category_id)
+        favorite_category = FavoritesCategory.objects.filter(category_id=category_id, user=user)
         if favorite_category.first() is None:
             return Response(status=400)
 
         favorite_category.delete()
-        favorite_subcategories = FavoritesSubcategory.objects.filter(subcategory__category_id=category_id)
+        favorite_subcategories = FavoritesSubcategory.objects.filter(subcategory__category_id=category_id, user=user)
         favorite_subcategories.delete()
 
         return Response(status=200)
@@ -169,3 +169,18 @@ class FavoritesAddSubcategoryView(APIView):
             return Response(status=400)
 
         return Response(status=201)
+
+
+class FavoritesRemoveSubcategoryView(APIView):
+    """Добавление подкатегории в отслеживаемое"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, subcategory_id):
+        user = request.user
+        favorite_subcategory = FavoritesSubcategory.objects.filter(subcategory_id=subcategory_id, user=user)
+        if favorite_subcategory.first() is None:
+            return Response(status=400)
+
+        favorite_subcategory.delete()
+        return Response(status=200)

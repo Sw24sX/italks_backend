@@ -26,7 +26,8 @@ urlpatterns = [
     path('favorites/video/add/<int:video_id>/', FavoritesViews.AddFavoritesVideoView.as_view()),  # Добавление видео в избранное
     path('favorites/video/remove/<int:video_id>/', FavoritesViews.RemoveFavoritesVideoView.as_view()),  # Удаление видео из избранного
     path('favorites/subcategory/', FavoritesViews.FavoritesListSubcategoryViews.as_view()),  # спиок отслеживаемых категорий
-    path('favorites/subcategory/add/<int:subcategory_id>/', FavoritesViews.FavoritesAddSubcategoryView.as_view()),
+    path('favorites/subcategory/add/<int:subcategory_id>/', FavoritesViews.FavoritesAddSubcategoryView.as_view()),  # добавление подкатегории в отслеживаемое
+    path('favorites/subcategory/remove/<int:subcategory_id>/', FavoritesViews.FavoritesRemoveSubcategoryView.as_view()),  # удаление подкатегории из отслеживаемого
     path('favorites/category/add/<int:category_id>/', FavoritesViews.FavoritesAddCategoryViews.as_view()),  # добавление категории в избранное
     path('favorites/category/remove/<int:category_id>/', FavoritesViews.FavoritesRemoveCategoryViews.as_view()),  # удаление категорий из избранного
 
