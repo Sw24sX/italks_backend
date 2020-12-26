@@ -67,9 +67,26 @@ class AddFavoritesVideoView(APIView):
             return Response(status=400)
 
         user = request.user
-        new_favorites = FavouritesVideos.objects.create(user=user, video=video)
-        new_favorites.save()
+        try:
+            FavouritesVideos.objects.create(user=user, video=video).save()
+        except:
+            return Response({'error': "Video has already been added"}, status=400)
+
         return Response(status=201)
+
+
+class RemoveFavoritesVideoView(APIView):
+    """Удаление видео из избранного"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request: Request, video_id: int):
+        video = Video.objects.filter(pk=video_id)
+        if video.first() is None:
+            return Response(status=400)
+
+        video.remove()
+        return Response(status=200)
 
 
 class FavoritesListSubcategoryViews(APIView):
