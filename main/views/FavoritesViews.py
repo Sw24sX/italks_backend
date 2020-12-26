@@ -96,11 +96,6 @@ class FavoritesListSubcategoryViews(APIView):
 
     def get(self, request):
         user = request.user
-
-        categories_list_id = FavoritesCategory.objects.filter(user=user).values_list('category_id', flat=True)
-        categories = Category.objects.filter(pk__in=categories_list_id)
-        serialized_categories = CategorySerializer(categories, many=True)
-
         subcategories_list_id = FavoritesSubcategory.objects.filter(user=user).values_list('subcategory_id', flat=True)
         subcategories = Subcategory.objects.filter(pk__in=subcategories_list_id)
         serialized = SubcategoriesSerializer(subcategories, many=True)
