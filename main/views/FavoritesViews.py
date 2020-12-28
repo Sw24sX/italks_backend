@@ -62,17 +62,18 @@ class AddFavoritesVideoView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request: Request, video_id: int):
-        video = Video.objects.filter(pk=video_id).first()
-        if video is None:
+        video = Video.objects.filter(pk=video_id)
+        if video.first() is None:
             return Response(status=400)
 
         user = request.user
         try:
-            FavouritesVideos.objects.create(user=user, video=video).save()
+            FavouritesVideos.objects.create(user=user, video=video.first()).save()
         except:
             return Response({'error': "Video has already been added"}, status=400)
 
-        return Response(status=201)
+        serialized = VideoSerializer(video, many=True, context={'user': request.user})
+        return Response(serialized.data, status=201)
 
 
 class RemoveFavoritesVideoView(APIView):
@@ -81,12 +82,18 @@ class RemoveFavoritesVideoView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request: Request, video_id: int):
-        video = FavouritesVideos.objects.filter(video_id=video_id, user=request.user)
+        video = Video.objects.filter(pk=video_id)
         if video.first() is None:
             return Response(status=400)
 
-        video.delete()
-        return Response(status=200)
+        favorite_video = FavouritesVideos.objects.filter(video=video.first(), user=request.user)
+        if favorite_video.first() is None:
+            return Response(status=400)
+
+        favorite_video.delete()
+
+        serialized = VideoSerializer(video, many=True, context={'user': request.user})
+        return Response(serialized.data, status=200)
 
 
 class FavoritesListSubcategoryViews(APIView):
@@ -108,24 +115,28 @@ class FavoritesAddCategoryViews(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, category_id):
-        user = request.user
         category = Category.objects.filter(pk=category_id).first()
         if category is None:
             return Response(status=400)
 
         #TODO Сделать нормальную обработку ошибок
         try:
-            FavoritesCategory.objects.create(user=user, category=category).save()
+            FavoritesCategory.objects.create(user=request.user, category=category).save()
         except:
             return Response(status=400)
 
-        for subcategory in category.subcategory.all():
+        favorite_subcategory_id = FavoritesSubcategory.objects\
+            .filter(user=request.user, subcategory__category=category)\
+            .values_list('subcategory_id', flat=True)
+        subcategories = Subcategory.objects.filter(category=category).exclude(pk__in=favorite_subcategory_id)
+        for subcategory in subcategories:
             try:
-                FavoritesSubcategory.objects.create(user=user, subcategory=subcategory).save()
+                FavoritesSubcategory.objects.create(user=request.user, subcategory=subcategory).save()
             except:
                 continue
 
-        return Response(status=201)
+        serialized = SubcategoriesSerializer(subcategories, many=True)
+        return Response(serialized.data, status=201)
 
 
 class FavoritesRemoveCategoryViews(APIView):
@@ -141,9 +152,12 @@ class FavoritesRemoveCategoryViews(APIView):
 
         favorite_category.delete()
         favorite_subcategories = FavoritesSubcategory.objects.filter(subcategory__category_id=category_id, user=user)
+        subcategories_id = list(favorite_subcategories.values_list('subcategory_id', flat=True))
+        subcategories = Subcategory.objects.filter(pk__in=subcategories_id)
         favorite_subcategories.delete()
+        serialized = SubcategoriesSerializer(subcategories, many=True)
 
-        return Response(status=200)
+        return Response(serialized.data, status=200)
 
 
 class FavoritesAddSubcategoryView(APIView):
@@ -153,29 +167,36 @@ class FavoritesAddSubcategoryView(APIView):
 
     def post(self, request, subcategory_id):
         user = request.user
-        subcategory = Subcategory.objects.filter(pk=subcategory_id).first()
-        if subcategory is None:
+        subcategory = Subcategory.objects.filter(pk=subcategory_id)
+        if subcategory.first() is None:
             return Response(status=400)
 
         # TODO Сделать нормальную обработку ошибок
         try:
-            FavoritesSubcategory.objects.create(user=user, subcategory=subcategory).save()
+            FavoritesSubcategory.objects.create(user=user, subcategory=subcategory.first()).save()
         except:
             return Response(status=400)
 
-        return Response(status=201)
+        serialized = SubcategoriesSerializer(subcategory, many=True)
+        return Response(serialized.data, status=201)
 
 
 class FavoritesRemoveSubcategoryView(APIView):
-    """Добавление подкатегории в отслеживаемое"""
+    """Удаление подкатегории из отслеживаемого"""
 
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, subcategory_id):
         user = request.user
+        subcategory = Subcategory.objects.filter(pk=subcategory_id)
+        if subcategory.first() is None:
+            return Response(status=400)
+
         favorite_subcategory = FavoritesSubcategory.objects.filter(subcategory_id=subcategory_id, user=user)
         if favorite_subcategory.first() is None:
             return Response(status=400)
 
         favorite_subcategory.delete()
-        return Response(status=200)
+        serialized = SubcategoriesSerializer(subcategory, many=True)
+
+        return Response(serialized.data, status=200)
