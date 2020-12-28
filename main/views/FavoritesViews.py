@@ -17,7 +17,7 @@ class FavoritesListVideosView(APIView):
 
     def get(self, request: Request):
         user = request.user
-        video_id = FavouritesVideos.objects.filter(user=user).values_list('id', flat=True)
+        video_id = FavouritesVideos.objects.filter(user=user).values_list('video_id', flat=True)
         videos = Video.objects.filter(pk__in=video_id)
 
         order_by = request.query_params.get('order_by')  # name, new_date, old_date, duration
@@ -32,9 +32,9 @@ class FavoritesListVideosView(APIView):
         page_size = request.query_params.get('page_size')
         if page_size is None:
             page_size = 60
-        videos, paginator = self.get_videos_page(videos, page, page_size)
 
-        serialized = VideoSerializer(videos, many=True, context={'user': request.user})
+        videos, paginator = self.get_videos_page(videos, page, page_size)
+        serialized = VideoSerializer(videos, many=True, context={'user': user})
 
         data = {
             "is_last_page": int(page) == paginator.num_pages,
@@ -90,7 +90,7 @@ class RemoveFavoritesVideoView(APIView):
 
 
 class FavoritesListSubcategoryViews(APIView):
-    """Список отслеживаемых категорий"""
+    """Список отслеживаемых подкатегорий"""
 
     permission_classes = [permissions.IsAuthenticated]
 
