@@ -125,8 +125,6 @@ class PromoVideoViews(APIView):
             "week": self.get_serialized_list_videos(week_videos, page, page_size, user),
             "month": self.get_serialized_list_videos(month_videos, page, page_size, user),
             "year": self.get_serialized_list_videos(year_videos, page, page_size, user),
-            'category_is_favorite': False,
-            'subcategory_is_favorite': False
         }
 
         if category_id is not None:
