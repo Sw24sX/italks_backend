@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
 
-from ..models import Category, Subcategory, Video, FavoritesCategory, FavoritesSubcategory, ProgressVideoWatch
+from ..models import Category, Subcategory, Video, FavoritesCategory, FavoritesSubcategory, ProgressVideoWatch, LastWatchVideo
 
 from ..serializers.VideoSerializer import VideoSerializer
 
@@ -326,5 +326,18 @@ class SaveProgressWatchVideoView(APIView):
         obj, created = ProgressVideoWatch.objects.update_or_create(user=request.user,
                                                                    video=video, defaults=values_for_update)
         video = Video.objects.filter(pk=obj.video.pk).first()
-        serialized = VideoSerializer(video, context={'time': time_per_seconds})
+        serialized = VideoSerializer(video, context={'time': time_per_seconds, 'user': request.user})
         return Response(serialized.data, status=202)
+
+
+class LastWatchVideoView(APIView):
+    """Последнее просмотренное видео"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request: Request):
+        video_id = LastWatchVideo.objects.filter(user=request.user).values_list('id', flat=True).first()
+        video = Video.objects.filter(pk=video_id).first()
+        time = ProgressVideoWatch.objects.filter(video=video, user=request.user).values_list('id', flat=True).first()
+        serialized = VideoSerializer(video, context={'time': time, 'user': request.user})
+        return Response(serialized.data, status=200)

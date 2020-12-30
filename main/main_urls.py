@@ -18,6 +18,7 @@ urlpatterns = [
     path('video/promo/', VideoViews.PromoVideoViews.as_view()),
     path('video/similar/<int:video_id>/', VideoViews.SimilarVideosViews.as_view()),  # Список похожих видео
     path('video/time/<int:video_id>/', VideoViews.SaveProgressWatchVideoView.as_view()),  # Сохранение прогресса просмотра видео (в секундах)
+    path('video/last/', VideoViews.LastWatchVideoView.as_view()),  # Получение последнего просмотренного видео
 
     path('auth/check_token/', UserView.CheckToken.as_view()),
 
