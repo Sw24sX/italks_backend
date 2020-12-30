@@ -21,7 +21,16 @@ class VideoViews(APIView):
         video = Video.objects.filter(pk=video_pk).first()
         if video is None:
             return Response(status=400)
-        serializer = VideoSerializer(video, context={'user': request.user})
+
+        time = ProgressVideoWatch.objects\
+            .filter(video=video, user=request.user)\
+            .values_list('id', flat=True)\
+            .first()
+
+        values_for_update = {'video': video}
+        obj, created = LastWatchVideo.objects.update_or_create(user=request.user, defaults=values_for_update)
+
+        serializer = VideoSerializer(video, context={'user': request.user, 'time': time})
         return Response(serializer.data, status=201)
 
 
