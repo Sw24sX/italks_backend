@@ -167,3 +167,21 @@ class UpcomingEvent(models.Model):
         db_table = "Events"
         unique_together = ('name', 'data')
         ordering = ['data']
+
+
+class ProgressVideoWatch(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    video = models.ForeignKey(Video, on_delete=models.CASCADE)
+    time = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "Video progress"
+        unique_together = ('user', 'video')
+
+
+class LastWatchVideo(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    video = models.ForeignKey(Video, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "Last video"

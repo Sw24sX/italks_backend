@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
 
-from ..models import Category, Subcategory, Video, FavoritesCategory, FavoritesSubcategory
+from ..models import Category, Subcategory, Video, FavoritesCategory, FavoritesSubcategory, ProgressVideoWatch
 
 from ..serializers.VideoSerializer import VideoSerializer
 
@@ -301,3 +301,30 @@ class SimilarVideosViews(APIView):
         }
 
         return Response(data, status=200)
+
+
+class SaveProgressWatchVideoView(APIView):
+    """Сохранение прогресса просмотра видео (в секундах)"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request: Request, video_id):
+        video = Video.objects.filter(pk=video_id).first()
+        if video is None:
+            return Response({'error': "Video not found"}, status=400)
+
+        time_per_seconds = request.query_params.get('time', None)
+        if time_per_seconds is None:
+            return Response({'error': "Time not found"}, status=400)
+
+        try:
+            time_per_seconds = int(time_per_seconds)
+        except ValueError as error:
+            return Response({'error': error.__str__()}, status=400)
+
+        values_for_update = {'time': time_per_seconds}
+        obj, created = ProgressVideoWatch.objects.update_or_create(user=request.user,
+                                                                   video=video, defaults=values_for_update)
+        video = Video.objects.filter(pk=obj.video.pk).first()
+        serialized = VideoSerializer(video, context={'time': time_per_seconds})
+        return Response(serialized.data, status=202)

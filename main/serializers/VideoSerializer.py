@@ -25,9 +25,15 @@ class VideoSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        user = self.context['user']
-        if not user.is_anonymous:
-            representation['is_favorite'] = FavouritesVideos.objects.filter(user=user, video=instance).exists()
+        if 'user' in self.context:
+            user = self.context['user']
+            if not user.is_anonymous:
+                representation['is_favorite'] = FavouritesVideos.objects.filter(user=user, video=instance).exists()
+
+        if 'time' in self.context:
+            time = self.context['time']
+            representation['time'] = time
+
         return representation
 
     class Meta:

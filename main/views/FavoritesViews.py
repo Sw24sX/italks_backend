@@ -129,6 +129,8 @@ class FavoritesAddCategoryViews(APIView):
             .filter(user=request.user, subcategory__category=category)\
             .values_list('subcategory_id', flat=True)
         subcategories = Subcategory.objects.filter(category=category).exclude(pk__in=favorite_subcategory_id)
+
+        # todo bulk_create()
         for subcategory in subcategories:
             try:
                 FavoritesSubcategory.objects.create(user=request.user, subcategory=subcategory).save()
