@@ -17,8 +17,8 @@ class VideoViews(APIView):
 
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request: Request, video_pk: int):
-        video = Video.objects.filter(pk=video_pk).first()
+    def get(self, request: Request, video_src: int):
+        video = Video.objects.filter(src=video_src).first()
         if video is None:
             return Response(status=400)
 
@@ -276,9 +276,9 @@ class VideosViews(APIView):
 class SimilarVideosViews(APIView):
     """Список похожих видео"""
 
-    def get(self, request, video_id):
+    def get(self, request, video_src):
         # todo запоминать данные о видео, его категорию и тд
-        video = Video.objects.filter(pk=video_id).first()
+        video = Video.objects.filter(src=video_src).first()
         if video is None:
             return Response(status=400)
 

@@ -12,11 +12,11 @@ urlpatterns = [
     path('subcategory/user/', CategoryViews.UserSubcategories.as_view()),
 
     path('video/', VideoViews.VideosViews.as_view()),
-    path('video/<int:video_pk>/', VideoViews.VideoViews.as_view()),  # Подробная информация о видео
+    path('video/<str:video_src>/', VideoViews.VideoViews.as_view()),  # Подробная информация о видео
     #path('video/create/', VideoCreateView.as_view()),
     path('video/sorted/<int:category_pk>/', VideoViews.VideoListCategoryView.as_view()),  # Список видео по категории
     path('video/promo/', VideoViews.PromoVideoViews.as_view()),
-    path('video/similar/<int:video_id>/', VideoViews.SimilarVideosViews.as_view()),  # Список похожих видео
+    path('video/similar/<str:video_src>/', VideoViews.SimilarVideosViews.as_view()),  # Список похожих видео
     path('video/time/<int:video_id>/', VideoViews.SaveProgressWatchVideoView.as_view()),  # Сохранение прогресса просмотра видео (в секундах)
     path('video/last/', VideoViews.LastWatchVideoView.as_view()),  # Получение последнего просмотренного видео
 
