@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
 
@@ -16,11 +17,10 @@ class VideoViews(APIView):
 
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request, video_pk):
+    def get(self, request: Request, video_pk: int):
         video = Video.objects.filter(pk=video_pk).first()
         if video is None:
             return Response(status=400)
-
         serializer = VideoSerializer(video, context={'user': request.user})
         return Response(serializer.data, status=201)
 
@@ -31,12 +31,50 @@ class VideoCreateView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        # todo not implemented
+
         serializer = VideoSerializer(data=request.data, context={'user': request.user})
         if not serializer.is_valid():
             return Response(status=400)
 
         serializer.save()
         return Response(serializer.data, status=201)
+
+
+class VideoParameters:
+    page: str
+    page_size: str
+    category_id: int
+    subcategory_id: int
+    period: str
+    order_by: str
+
+    def __init__(self, request: Request, with_page=False):
+        self.page = request.query_params.get('page', None)
+        if with_page and self.page is None:
+            raise ValueError("Argument 'page' not found")
+        self.page_size = request.query_params.get('page_size', None)
+
+        self.category_id = request.query_params.get('category_id', None)
+        if self.category_id is not None:
+            self.category_id = int(self.category_id)
+
+        self.subcategory_id = request.query_params.get('subcategory_id', None) #todo
+        if self.subcategory_id is not None:
+            self.subcategory_id = int(self.subcategory_id)
+
+        self.period = request.query_params.get('period', None)
+        if self.period is not None and self.period not in ["year", "month", "week"]:
+            raise ValueError("period can only be a 'year' | 'month' | 'week'")
+
+        self.order_by = request.query_params.get('order_by', None)
+        if self.order_by is not None:
+            if self.order_by not in ["name", "new_date", "old_date", "duration"]:
+                raise ValueError("order_by can only be a 'name' | 'new_date' | 'old_date' | 'duration'")
+            elif self.order_by == 'new_date':
+                self.order_by = "-date"
+            elif self.order_by == 'old_date':
+                self.order_by = 'date'
 
 
 class VideoListCategoryView(APIView):
@@ -46,33 +84,29 @@ class VideoListCategoryView(APIView):
 
     def get(self, request, category_pk):
         # todo сделать сортировку безопасной
+        if not Category.objects.filter(pk=category_pk).exists():
+            return Response({'error': "Category with entered category_id was not found"}, status=400)
 
-        period = request.query_params.get('period')
-        subcategory_id = request.query_params.get('subcategory')
-        order_by = request.query_params.get('order_by')  # name, new_date, old_date, duration
-        if order_by == "new_date":
-            order_by = "-date"
-        elif order_by == "old_date":
-            order_by = "date"
-        videos = VideosViews.get_videos_by_period(period)
-        if videos is None:
-            return Response(status=400)
+        try:
+            video_params = VideoParameters(request, with_page=True)
+        except (ValueError, TypeError) as error:
+            return Response({'error': error.__str__()}, status=400)
 
+        videos = VideosViews.get_videos_by_period(video_params.period)
         videos = videos.filter(category__id=category_pk)
-        if subcategory_id is not None:
-            videos = videos.filter(subcategory__id=subcategory_id)
-        if order_by is not None:
-            videos = videos.order_by(order_by)
 
-        # todo добавить обработку исключений; попробовать использовать annotate
-        #page_size = request.query_params.get('page_size')
+        if video_params.subcategory_id is not None:
+            videos = videos.filter(subcategory__id=video_params.subcategory_id)
+        if video_params.order_by is not None:
+            videos = videos.order_by(video_params.order_by)
 
-        page = request.query_params.get('page')
-        videos, paginator = VideosViews.get_videos_page(videos, page)
+        if video_params.page_size is None:
+            video_params.page_size = 60
+        videos, paginator = VideosViews.get_videos_page(videos, video_params.page, video_params.page_size)
 
         serialized_result = VideoSerializer(videos, many=True, context={'user': request.user})
         data = {
-            "is_last_page": int(page) == paginator.num_pages,
+            "is_last_page": int(video_params.page) == paginator.num_pages,
             "number_pages": paginator.num_pages,
             "videos_page": serialized_result.data
         }
@@ -165,7 +199,7 @@ class VideosViews(APIView):
         elif order_by == "old_date":
             order_by = "date"
 
-        # todo добавить обработку исключений; попробовать использовать annotate
+        # todo добавить обработку исключений
         page = request.query_params.get('page')
         if order_by is not None:
             videos = videos.order_by(order_by)
@@ -179,11 +213,11 @@ class VideosViews(APIView):
             "number_pages": paginator.num_pages,
             "videos_page": serialized_result.data
         }
-        #TODO ЗАМЕНИТЬ НА СТАТУС 200 ВЕСЗДЕ
-        return Response(data, status=201)
+        # TODO ЗАМЕНИТЬ НА СТАТУС 200 ВЕЗДЕ
+        return Response(data, status=200)
 
     @staticmethod
-    def get_videos_page(videos, page: int, page_size=60):
+    def get_videos_page(videos, page, page_size=60):
         paginator = Paginator(videos, page_size)
         try:
             videos = paginator.page(page)
@@ -196,23 +230,22 @@ class VideosViews(APIView):
 
     @staticmethod
     def get_videos_by_period(period: str):
+        videos = Video.objects.all()
         if period == "year":
             # ONLY FOR DEV
             pk_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            videos = Video.objects.filter(pk__in=pk_list)
-            #videos = Video.objects.filter(date__lt=self.get_date_start_current_month()) \
+            videos = videos.filter(pk__in=pk_list)
+            #videos = videos.filter(date__lt=self.get_date_start_current_month()) \
             #    .filter(date__gte=self.get_date_start_current_year())
         elif period == "month":
             pk_list = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-            videos = Video.objects.filter(pk__in=pk_list)
-            #videos = Video.objects.filter(date__lt=self.get_date_start_week()) \
+            videos = videos.filter(pk__in=pk_list)
+            #videos = videos.filter(date__lt=self.get_date_start_week()) \
             #    .filter(date__gte=self.get_date_start_current_month())
         elif period == "week":
             #pk_list = [i for i in range(1, 122)]
             videos = Video.objects.all()
-            #videos = Video.objects.filter(date__gte=self.get_date_start_week())
-        else:
-            return None
+            #videos = videos.filter(date__gte=self.get_date_start_week())
         return videos
 
     @staticmethod
