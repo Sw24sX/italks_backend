@@ -1,4 +1,5 @@
 from datetime import datetime, date, timedelta
+from enum import Enum, auto
 
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -33,7 +34,6 @@ class VideoViews(APIView):
         values_for_update = {'video': video}
         if not request.user.is_anonymous:
             obj, created = LastWatchVideo.objects.update_or_create(user=request.user, defaults=values_for_update)
-        print(request.user.is_anonymous)
         serializer = VideoSerializer(video, context={'user': request.user, 'time': time})
         return Response(serializer.data, status=201)
 
@@ -54,6 +54,12 @@ class VideoCreateView(APIView):
         return Response(serializer.data, status=201)
 
 
+class VideoPeriod(Enum):
+    WEEK = auto()
+    MONTH = auto()
+    YEAR = auto()
+
+
 class VideoParameters:
     page: str
     page_size: str
@@ -61,12 +67,14 @@ class VideoParameters:
     subcategory_id: int
     period: str
     order_by: str
+    category: Category
+    subcategory: Subcategory
 
-    def __init__(self, request: Request, with_page=False):
+    def __init__(self, request: Request, with_page=False, default_page_size=10):
         self.page = request.query_params.get('page', None)
         if with_page and self.page is None:
             raise ValueError("Argument 'page' not found")
-        self.page_size = request.query_params.get('page_size', None)
+        self.page_size = request.query_params.get('page_size', default_page_size)
 
         self.category_id = request.query_params.get('category_id', None)
         if self.category_id is not None:
@@ -88,6 +96,31 @@ class VideoParameters:
                 self.order_by = "-date"
             elif self.order_by == 'old_date':
                 self.order_by = 'date'
+        self.subcategory = None
+        self.category = None
+
+    def subcategory_id_and_category_id_is_correct(self):
+        if self.category_id_is_exists() and self.subcategory_id_is_exists():
+            return Subcategory.objects.filter(pk=self.subcategory_id, category_id=self.category_id).exists()
+        return False
+
+    def category_id_is_exists(self):
+        if self.category_id is not None:
+            return Category.objects.filter(pk=self.category_id).exists()
+        return False
+
+    def subcategory_id_is_exists(self):
+        if self.subcategory_id is not None:
+            return Subcategory.objects.filter(pk=self.subcategory_id).exists()
+        return False
+
+    def find_category(self) -> bool:
+        self.category = Category.objects.filter(pk=self.category_id).first()
+        return self.category is not None
+
+    def find_subcategory(self) -> bool:
+        self.subcategory = Subcategory.objects.filter(pk=self.subcategory_id).first()
+        return self.subcategory is not None
 
 
 class VideoListCategoryView(APIView):
@@ -101,7 +134,7 @@ class VideoListCategoryView(APIView):
             return Response({'error': "Category with entered category_id was not found"}, status=400)
 
         try:
-            video_params = VideoParameters(request, with_page=True)
+            video_params = VideoParameters(request, with_page=True, default_page_size=60)
         except (ValueError, TypeError) as error:
             return Response({'error': error.__str__()}, status=400)
 
@@ -132,67 +165,46 @@ class PromoVideoViews(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        print('is video_promo')
-        category_id = request.query_params.get('category_id')
-        category = None
-        if category_id is not None:
-            category = Category.objects.filter(pk=category_id).first()
-            if category is None:
-                print('error category_id')
-                return Response(status=400)
+        try:
+            video_params = VideoParameters(request, with_page=True, default_page_size=6)
+        except (ValueError, TypeError) as error:
+            return Response(status=400)
 
-        subcategory_id = request.query_params.get('subcategory_id')
-        subcategory = None
-        if subcategory_id is not None:
-            subcategory = Subcategory.objects.filter(pk=subcategory_id).first()
-            if subcategory is None:
-                print('error subcategory_id')
-                return Response(status=400)
-
-        page_size = request.query_params.get('page_size')
-        if page_size is None:
-            page_size = 6
-        page = request.query_params.get('page')
-        if page is None:
-            page = 1
-
-        week_videos = VideosViews.get_videos_by_period('week')
-        month_videos = VideosViews.get_videos_by_period('month')
-        year_videos = VideosViews.get_videos_by_period('year')
-
-        if subcategory_id is not None:
-            week_videos = week_videos.filter(subcategory__id=subcategory_id)
-            month_videos = month_videos.filter(subcategory__id=subcategory_id)
-            year_videos = year_videos.filter(subcategory__id=subcategory_id)
-
-        if category_id is not None:
-            week_videos = week_videos.filter(category__id=category_id)
-            month_videos = month_videos.filter(category__id=category_id)
-            year_videos = year_videos.filter(category__id=category_id)
+        if video_params.find_category() and video_params.find_subcategory() \
+                and not video_params.subcategory_id_and_category_id_is_correct():
+            return Response(status=400)
 
         user = request.user
         data = {
-            "week": self.get_serialized_list_videos(week_videos, page, page_size, user),
-            "month": self.get_serialized_list_videos(month_videos, page, page_size, user),
-            "year": self.get_serialized_list_videos(year_videos, page, page_size, user),
+            "week": self.get_serialized_list_videos('week', video_params, user),
+            "month": self.get_serialized_list_videos('month', video_params, user),
+            "year": self.get_serialized_list_videos('year', video_params, user),
         }
 
-        if category_id is not None:
-            data['category_name'] = category.name
+        if video_params.category is not None:
+            data['category_name'] = video_params.category.name
             if not request.user.is_anonymous:
                 data['category_is_favorite'] = FavoritesCategory.objects.filter(user=request.user,
-                                                                                category=category).exists()
+                                                                                category=video_params.category).exists()
 
-        if subcategory_id is not None:
-            data['subcategory_name'] = subcategory.name
+        if video_params.subcategory is not None:
+            data['subcategory_name'] = video_params.subcategory.name
             if not request.user.is_anonymous:
                 data['subcategory_is_favorite'] = FavoritesSubcategory.objects.filter(user=request.user,
-                                                                                      subcategory=subcategory).exists()
+                                                                                      subcategory=video_params.subcategory).exists()
         return Response(data, status=201)
 
-    @staticmethod
-    def get_serialized_list_videos(videos, page, page_size, user):
-        videos, _ = VideosViews.get_videos_page(videos, page, page_size)
+    def get_filtered_videos_by_period(self, period: str, video_params: VideoParameters):
+        videos = VideosViews.get_videos_by_period(period)
+        if video_params.category_id is not None:
+            videos.filter(category__id=video_params.category_id)
+        if video_params.subcategory_id is not None:
+            videos.filter(subcategory__id=video_params.subcategory_id)
+        return videos
+
+    def get_serialized_list_videos(self, period: str, video_params, user):
+        videos = self.get_filtered_videos_by_period(period, video_params)
+        videos, _ = VideosViews.get_videos_page(videos, video_params.page, video_params.page_size)
         return VideoSerializer(videos, many=True, context={'user': user}).data
 
 
