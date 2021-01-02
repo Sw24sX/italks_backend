@@ -70,10 +70,9 @@ class VideoParameters:
     category: Category
     subcategory: Subcategory
 
-    def __init__(self, request: Request, with_page=False, default_page_size=10):
-        self.page = request.query_params.get('page', None)
-        if with_page and self.page is None:
-            raise ValueError("Argument 'page' not found")
+    def __init__(self, request: Request, default_page_size=10):
+        self.page = request.query_params.get('page', 1)
+
         self.page_size = request.query_params.get('page_size', default_page_size)
 
         self.category_id = request.query_params.get('category_id', None)
@@ -134,7 +133,7 @@ class VideoListCategoryView(APIView):
             return Response({'error': "Category with entered category_id was not found"}, status=400)
 
         try:
-            video_params = VideoParameters(request, with_page=True, default_page_size=60)
+            video_params = VideoParameters(request, default_page_size=60)
         except (ValueError, TypeError) as error:
             return Response({'error': error.__str__()}, status=400)
 
@@ -166,10 +165,9 @@ class PromoVideoViews(APIView):
 
     def get(self, request):
         try:
-            video_params = VideoParameters(request, with_page=True, default_page_size=6)
+            video_params = VideoParameters(request, default_page_size=6)
         except (ValueError, TypeError) as error:
             return Response(status=400)
-
         if video_params.find_category() and video_params.find_subcategory() \
                 and not video_params.subcategory_id_and_category_id_is_correct():
             return Response(status=400)
@@ -192,14 +190,14 @@ class PromoVideoViews(APIView):
             if not request.user.is_anonymous:
                 data['subcategory_is_favorite'] = FavoritesSubcategory.objects.filter(user=request.user,
                                                                                       subcategory=video_params.subcategory).exists()
-        return Response(data, status=201)
+        return Response(data, status=200)
 
     def get_filtered_videos_by_period(self, period: str, video_params: VideoParameters):
         videos = VideosViews.get_videos_by_period(period)
         if video_params.category_id is not None:
-            videos.filter(category__id=video_params.category_id)
+            videos = videos.filter(category__id=video_params.category_id)
         if video_params.subcategory_id is not None:
-            videos.filter(subcategory__id=video_params.subcategory_id)
+            videos = videos.filter(subcategory__id=video_params.subcategory_id)
         return videos
 
     def get_serialized_list_videos(self, period: str, video_params, user):

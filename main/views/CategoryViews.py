@@ -15,7 +15,7 @@ class CategoryListView(APIView):
     def get(self, request):
         categories = Category.objects.all()
         result = CategorySerializer(categories, many=True)
-        return Response(result.data, status=201)
+        return Response(result.data, status=200)
 
 
 class CategoryCreateView(APIView):
@@ -44,7 +44,7 @@ class SubcategoryListView(APIView):
 
         subcategories = Subcategory.objects.filter(category=category)
         serializer = SubcategorySerializer(subcategories, many=True)
-        return Response(serializer.data, status=201)
+        return Response(serializer.data, status=200)
 
 
 class SubcategoryCreateView(APIView):
@@ -73,7 +73,7 @@ class SubcategoryAndCategoryView(APIView):
     def get(self, request):
         categories = Category.objects.all()
         serializers = CategoryAndSubcategorySerializer(categories, many=True)
-        return Response(serializers.data, status=201)
+        return Response(serializers.data, status=200)
 
 
 class UserSubcategories(APIView):
@@ -83,4 +83,4 @@ class UserSubcategories(APIView):
         #todo сделать список любимых подкатегорий пользователя. Если их мало - возвращать смежные категории или рандомные
         subcategories = Subcategory.objects.all()
         serialized = SubcategorySerializer(subcategories, many=True)
-        return Response(serialized.data, status=201)
+        return Response(serialized.data, status=200)
