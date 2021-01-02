@@ -17,19 +17,23 @@ class VideoViews(APIView):
 
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request: Request, video_src: int):
+    def get(self, request: Request, video_src: str):
+    #def get(self, request: Request, video_id: int):
         video = Video.objects.filter(src=video_src).first()
         if video is None:
             return Response(status=400)
 
-        time = ProgressVideoWatch.objects\
-            .filter(video=video, user=request.user)\
-            .values_list('id', flat=True)\
-            .first()
+        time = 0
+        if not request.user.is_anonymous:
+            time = ProgressVideoWatch.objects\
+                .filter(video=video, user=request.user)\
+                .values_list('id', flat=True)\
+                .first()
 
         values_for_update = {'video': video}
-        obj, created = LastWatchVideo.objects.update_or_create(user=request.user, defaults=values_for_update)
-
+        if not request.user.is_anonymous:
+            obj, created = LastWatchVideo.objects.update_or_create(user=request.user, defaults=values_for_update)
+        print(request.user.is_anonymous)
         serializer = VideoSerializer(video, context={'user': request.user, 'time': time})
         return Response(serializer.data, status=201)
 
@@ -128,11 +132,13 @@ class PromoVideoViews(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
+        print('is video_promo')
         category_id = request.query_params.get('category_id')
         category = None
         if category_id is not None:
             category = Category.objects.filter(pk=category_id).first()
             if category is None:
+                print('error category_id')
                 return Response(status=400)
 
         subcategory_id = request.query_params.get('subcategory_id')
@@ -140,6 +146,7 @@ class PromoVideoViews(APIView):
         if subcategory_id is not None:
             subcategory = Subcategory.objects.filter(pk=subcategory_id).first()
             if subcategory is None:
+                print('error subcategory_id')
                 return Response(status=400)
 
         page_size = request.query_params.get('page_size')

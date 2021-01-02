@@ -12,7 +12,8 @@ urlpatterns = [
     path('subcategory/user/', CategoryViews.UserSubcategories.as_view()),
 
     path('video/', VideoViews.VideosViews.as_view()),
-    path('video/<str:video_src>/', VideoViews.VideoViews.as_view()),  # Подробная информация о видео
+    path('video/info/<str:video_src>/', VideoViews.VideoViews.as_view()),  # Подробная информация о видео
+    #path('video/<int:video_id>/', VideoViews.VideoViews.as_view()),
     #path('video/create/', VideoCreateView.as_view()),
     path('video/sorted/<int:category_pk>/', VideoViews.VideoListCategoryView.as_view()),  # Список видео по категории
     path('video/promo/', VideoViews.PromoVideoViews.as_view()),
