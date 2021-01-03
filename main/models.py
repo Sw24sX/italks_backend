@@ -29,6 +29,16 @@ class User(AbstractUser):
         swappable = 'AUTH_USER_MODEL'
 
 
+class UserSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    notifications = models.BooleanField(default=True)
+    dark_theme = models.BooleanField(default=False)
+    as_device = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "Settings"
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     icon_base_64 = models.TextField()

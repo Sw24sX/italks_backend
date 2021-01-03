@@ -36,6 +36,13 @@ urlpatterns = [
 
     path('events/', UpcomingEventViews.EventListView.as_view()),
 
+    path('settings/', UserView.Settings.as_view()),  # Получениие данных настроек пользователя
+    path('settings/user/', UserView.UserSettingsView.as_view()),  # Сохранение изменений данных пользователя
+    path('settings/other/', UserView.OtherSettingsView.as_view()),
+    path('settings/notification/<int:is_notification>/', UserView.NotificationsSettingsView.as_view()),  # Изменение флага "получать уведомления"
+    path('settings/dark_theme/<int:is_dark_theme>/', UserView.DarkThemeSettingsView.as_view()),  # Изменение флага "темная тема"
+    path('settings/as_device/<int:is_as_device>/', UserView.AsDeviceSettingsView.as_view()),  # Изменение флага "как на устройстве"
+
     path('test/', TestViews.TestViews.as_view()),
 
 ]
