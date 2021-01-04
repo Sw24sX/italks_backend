@@ -23,14 +23,16 @@ class VideoViews(APIView):
         video = Video.objects.filter(src=video_src).first()
         if video is None:
             return Response(status=400)
-
+        print("###########")
+        print(video.id)
         time = 0
         if not request.user.is_anonymous:
             time = ProgressVideoWatch.objects\
                 .filter(video=video, user=request.user)\
-                .values_list('id', flat=True)\
+                .values_list('time', flat=True)\
                 .first()
-
+        print(time)
+        print("#############")
         values_for_update = {'video': video}
         if not request.user.is_anonymous:
             obj, created = LastWatchVideo.objects.update_or_create(user=request.user, defaults=values_for_update)
@@ -347,10 +349,15 @@ class SaveProgressWatchVideoView(APIView):
             time_per_seconds = int(time_per_seconds)
         except ValueError as error:
             return Response({'error': error.__str__()}, status=400)
+        print("#########")
+        print(time_per_seconds)
 
         values_for_update = {'time': time_per_seconds}
         obj, created = ProgressVideoWatch.objects.update_or_create(user=request.user,
                                                                    video=video, defaults=values_for_update)
+        print(created)
+        print(obj.time)
+        print("##########")
         video = Video.objects.filter(pk=obj.video.pk).first()
         serialized = VideoSerializer(video, context={'time': time_per_seconds, 'user': request.user})
         return Response(serialized.data, status=202)
