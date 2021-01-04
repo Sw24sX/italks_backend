@@ -25,10 +25,13 @@ class VideoViews(APIView):
             return Response(status=400)
         time = 0
         if not request.user.is_anonymous:
-            time = ProgressVideoWatch.objects\
+            result_find = ProgressVideoWatch.objects\
                 .filter(video=video, user=request.user)\
                 .values_list('time', flat=True)\
                 .first()
+            if result_find is not None:
+                time = result_find
+
         values_for_update = {'video': video}
         if not request.user.is_anonymous:
             obj, created = LastWatchVideo.objects.update_or_create(user=request.user, defaults=values_for_update)
