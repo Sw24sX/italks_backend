@@ -123,7 +123,7 @@ class UserSettingsView(APIView):
                 'info_user': {'username': request.user.username},
                 'errors': errors,
             }
-            return Response(errors, status=200)
+            return Response(data, status=200)
 
         #settings = UserSettings.objects.filter(user=request.user).first()
         #if settings is not None:
