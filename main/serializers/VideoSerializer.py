@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from ..models import Video, Category, Author, Resource, FavouritesVideos
+from ..models import Video, Category, Author, Resource, FavouritesVideos, LastWatchVideo
 from ..serializers.CategorySerializer import CategorySerializer, SubcategorySerializer
+from ..serializers.UserSerializer import UserSerializer
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -44,4 +45,14 @@ class VideoSerializer(serializers.ModelSerializer):
 
 class SearchResultSerializer(serializers.Serializer):
     result = VideoSerializer(many=True)
+
+
+class LastVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LastWatchVideo
+        fields = ('video',)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        video = instance.video
 

@@ -11,31 +11,37 @@ from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 
 from ..models import UserSettings
-from ..serializers.UserSerializer import UserSettingsSerializer
+from ..serializers.UserSerializer import UserSettingsSerializer, UserSerializer, UserDataSettingsSerializer
 
 
 class CheckToken(APIView):
-    """Проверка на актуальность токена"""
+    """Проверка на актуальность токена + информация о пользователе"""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        return Response(status=201)
+
+        return Response(status=200)
 
 
 class UserSettingsInput:
-    username: str
-    password: str
-    email: str
-    request: Request
+    username: str = None
+    new_password: str = None
+    old_password: str = None
+    request: Request = None
 
     def __init__(self, request: Request):
-        self.username = request.query_params.get('username', None)
-        self.password = request.query_params.get('password', None)
-        self.email = request.query_params.get('email', None)
+        data = request.data
+
+        if 'username' in data:
+            self.username = data['username']
+        if 'new_password' in data:
+            self.new_password = data['new_password']
+        if 'old_password' in data:
+            self.old_password = data['old_password']
         self.request = request
 
-        if None in [self.username, self.password, self.email]:
-            raise ValueError
+        #if None in [self.username, self.password, self.email]:
+        #    raise ValueError
 
     def update_user_data(self) -> dict:
         errors = {}
@@ -43,41 +49,48 @@ class UserSettingsInput:
         if self._username_is_change():
             reg = re.compile('[^a-z0-9_]')
             if len(reg.sub('', self.username)) != len(self.username):
-                errors['username'] = ['Имя не может содержать спецсимволы']
+                errors['username'] = 'Имя не может содержать спецсимволы'
             else:
                 user.username = self.username
-        if self.email_is_change():
-            errors_messages = self._email_validation()
-            if errors_messages is not None:
-                errors['email'] = errors_messages
+        #if self.email_is_change():
+        #    errors_messages = self._email_validation()
+        #    if errors_messages is not None:
+        #        errors['email'] = errors_messages
+        #    else:
+        #        user.email = self.email
+        if self._new_password_is_change():
+            if self._old_password_is_correct():
+                try:
+                    password_validation.validate_password(self.new_password, user=self.request.user)
+                except ValidationError as err:
+                    errors['password'] = err.messages[0]
+                else:
+                    user.set_password(self.new_password)
             else:
-                user.email = self.email
-        if self._password_is_change():
-            try:
-                password_validation.validate_password(self.password, user=self.request.user)
-            except ValidationError as err:
-                errors['password'] = err.messages
-            else:
-                user.set_password(self.password)
+                errors['password'] = 'Старый пароль не верный'
         if len(errors) == 0:
             user.save()
         return errors
 
-    def email_is_change(self) -> bool:
-        return self.email != self.request.user.email
+    #def email_is_change(self) -> bool:
+    #    return self.email is not None and self.email != self.request.user.email
 
     def _email_validation(self):
         email_validator = EmailValidator()
         try:
-            email_validator(self.email)
+            #email_validator(self.email)
+            pass
         except ValidationError as error:
             return error.messages
 
     def _username_is_change(self) -> bool:
-        return self.request.user.username != self.username
+        return self.username is not None and self.request.user.username != self.username
 
-    def _password_is_change(self) -> bool:
-        return not self.request.user.check_password(self.password)
+    def _old_password_is_correct(self) -> bool:
+        return self.old_password is not None and self.request.user.check_password(self.old_password)
+
+    def _new_password_is_change(self) -> bool:
+        return self.new_password is not None and not self.request.user.check_password(self.new_password)
 
 
 class Settings(APIView):
@@ -100,20 +113,25 @@ class UserSettingsView(APIView):
         except ValueError:
             return Response(status=400)
 
-        if user_settings.email_is_change():
-            # todo send email
-            pass
+        #if user_settings.email_is_change():
+        #    # todo send email
+        #    pass
 
         errors = user_settings.update_user_data()
         if len(errors) != 0:
+            data = {
+                'info_user': {'username': request.user.username},
+                'errors': errors,
+            }
             return Response(errors, status=200)
 
-        settings = UserSettings.objects.filter(user=request.user).first()
-        if settings is not None:
-            return Response(status=400)
+        #settings = UserSettings.objects.filter(user=request.user).first()
+        #if settings is not None:
+        #    return Response(status=400)
 
-        serialized = UserSettingsSerializer(settings)
-        return Response(serialized.data, status=200)
+        #serialized = UserSettingsSerializer(settings)
+        #serialized = UserSerializer(request.user)
+        return Response({'username': request.user.username}, status=200)
 
 
 class OtherSettingsView(APIView):

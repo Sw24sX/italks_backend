@@ -19,7 +19,6 @@ class VideoViews(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request: Request, video_src: str):
-    #def get(self, request: Request, video_id: int):
         video = Video.objects.filter(src=video_src).first()
         if video is None:
             return Response(status=400)

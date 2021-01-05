@@ -12,15 +12,27 @@ from ..serializers.VideoSerializer import VideoSerializer
 from ..serializers import TestSerializer
 from django.db.models import Q
 import random
+import json
 
 
 class TestViews(APIView):
     """Тест"""
 
-    def get(self, request):
-        category = Category.objects.get(pk=1)
-        print(type(category))
-        print(type('str'))
+    def post(self, request):
+        body_unicode = request.data.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        print(body_data)
+
+        test = TestSerializer.TestSerializer(data=request.data)
+        test.is_valid()
+        t = test.validated_data
+        print(t)
+        print(type(t))
+        print(t['username'])
+        #print(test)
+        #print(test.username)
+        #print(test.password)
+        #print(test.email)
         return Response(status=201)
 
     def fill_videos(self):

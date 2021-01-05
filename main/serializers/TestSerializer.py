@@ -28,19 +28,33 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class TestSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+    email = serializers.CharField()
 
-    def to_representation(self, instance):
-        request = self.context['request']
-        representation = super().to_representation(instance)
-        representation['IsFavorite'] = True
-        user = request.user
-        author = Author.objects.get(pk=1)
-        representation['user'] = AuthorSerializer(author).data
-        if user.is_active:
-            representation['IsActive'] = True
-        else:
-            representation['IsActive'] = False
-        return representation
+    def create(self, validated_data):
+        return validated_data
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.username = validated_data.get('username', instance.username)
+        instance.new_password = validated_data.get('password', instance.new_password)
+        return instance
+
+
+class CommentSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    content = serializers.CharField(max_length=200)
+    created = serializers.DateTimeField()
+
+    def create(self, validated_data):
+        return validated_data
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.content = validated_data.get('content', instance.content)
+        instance.created = validated_data.get('created', instance.created)
+        return instance
 
 
 class AuthorSerializer(serializers.ModelSerializer):
