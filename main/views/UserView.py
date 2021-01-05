@@ -40,8 +40,6 @@ class UserSettingsInput:
             self.old_password = data['old_password']
         self.request = request
 
-        #if None in [self.username, self.password, self.email]:
-        #    raise ValueError
 
     def update_user_data(self) -> dict:
         errors = {}
@@ -52,36 +50,21 @@ class UserSettingsInput:
                 errors['username'] = 'Имя не может содержать спецсимволы'
             else:
                 user.username = self.username
-        #if self.email_is_change():
-        #    errors_messages = self._email_validation()
-        #    if errors_messages is not None:
-        #        errors['email'] = errors_messages
-        #    else:
-        #        user.email = self.email
+
         if self._new_password_is_change():
             if self._old_password_is_correct():
                 try:
                     password_validation.validate_password(self.new_password, user=self.request.user)
                 except ValidationError as err:
-                    errors['password'] = err.messages[0]
+                    errors['new_password'] = err.messages[0]
                 else:
                     user.set_password(self.new_password)
             else:
-                errors['password'] = 'Старый пароль не верный'
+                errors['old_password'] = 'Старый пароль не верный'
         if len(errors) == 0:
             user.save()
         return errors
 
-    #def email_is_change(self) -> bool:
-    #    return self.email is not None and self.email != self.request.user.email
-
-    def _email_validation(self):
-        email_validator = EmailValidator()
-        try:
-            #email_validator(self.email)
-            pass
-        except ValidationError as error:
-            return error.messages
 
     def _username_is_change(self) -> bool:
         return self.username is not None and self.request.user.username != self.username
@@ -125,12 +108,6 @@ class UserSettingsView(APIView):
             }
             return Response(data, status=400)
 
-        #settings = UserSettings.objects.filter(user=request.user).first()
-        #if settings is not None:
-        #    return Response(status=400)
-
-        #serialized = UserSettingsSerializer(settings)
-        #serialized = UserSerializer(request.user)
         data = {
             'info_user': {'username': request.user.username},
         }
