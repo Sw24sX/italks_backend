@@ -131,7 +131,10 @@ class UserSettingsView(APIView):
 
         #serialized = UserSettingsSerializer(settings)
         #serialized = UserSerializer(request.user)
-        return Response({'username': request.user.username}, status=200)
+        data = {
+            'info_user': {'username': request.user.username},
+        }
+        return Response(data, status=200)
 
 
 class OtherSettingsView(APIView):
