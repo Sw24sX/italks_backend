@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from ..models import UserSettings, User
-#from ..serializers.VideoSerializer import VideoSerializer
+from ..models import UserSettings, User, ProgressVideoWatch, Video, LastWatchVideo
+from ..serializers.VideoSerializers import VideoSerializer
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -10,24 +10,18 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        settings, _ = UserSettings.objects.get_or_create(user=instance)
+        representation['dark_theme'] = settings.dark_theme
         representation['last_video'] = None
-        #if 'last_video' in self.context:
-            #representation['last_video'] = VideoSerializer(self.context['last_video'], context=instance)
 
-
-class UserDataSettingsSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    old_password = serializers.CharField()
-    new_password = serializers.CharField()
-
-    def create(self, validated_data):
-        return validated_data
-
-    def update(self, instance, validated_data):
-        instance.email = validated_data.get('email', instance.email)
-        instance.username = validated_data.get('username', instance.username)
-        instance.new_password = validated_data.get('password', instance.new_password)
-        return instance
+        if 'last_video' in self.context:
+            video = self.context['last_video']
+            time = ProgressVideoWatch.objects\
+                .filter(user=instance, video=video)\
+                .values_list('time', flat=True)\
+                .first()
+            representation['last_video'] = VideoSerializer(video, context={'user': instance}).data
+        return representation
 
 
 class UserSerializer(serializers.ModelSerializer):

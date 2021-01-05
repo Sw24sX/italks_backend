@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import permissions
 
 from ..models import Video, CategoryNames, SubcategoryNames
-from ..serializers.VideoSerializer import VideoSerializer
+from ..serializers.VideoSerializers import VideoSerializer
 from django.core.paginator import Paginator, EmptyPage
 
 

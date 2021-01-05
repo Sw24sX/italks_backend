@@ -8,7 +8,7 @@ from rest_framework import generics, permissions
 
 from ..models import Category, Subcategory, Video, FavoritesCategory, FavoritesSubcategory, ProgressVideoWatch, LastWatchVideo
 
-from ..serializers.VideoSerializer import VideoSerializer
+from ..serializers.VideoSerializers import VideoSerializer
 
 from django.core.paginator import Paginator, EmptyPage
 
@@ -22,19 +22,12 @@ class VideoViews(APIView):
         video = Video.objects.filter(src=video_src).first()
         if video is None:
             return Response(status=400)
-        time = 0
-        if not request.user.is_anonymous:
-            result_find = ProgressVideoWatch.objects\
-                .filter(video=video, user=request.user)\
-                .values_list('time', flat=True)\
-                .first()
-            if result_find is not None:
-                time = result_find
 
         values_for_update = {'video': video}
         if not request.user.is_anonymous:
             obj, created = LastWatchVideo.objects.update_or_create(user=request.user, defaults=values_for_update)
-        serializer = VideoSerializer(video, context={'user': request.user, 'time': time})
+
+        serializer = VideoSerializer(video, context={'user': request.user})
         return Response(serializer.data, status=201)
 
 
@@ -347,17 +340,12 @@ class SaveProgressWatchVideoView(APIView):
             time_per_seconds = int(time_per_seconds)
         except ValueError as error:
             return Response({'error': error.__str__()}, status=400)
-        print("#########")
-        print(time_per_seconds)
 
         values_for_update = {'time': time_per_seconds}
         obj, created = ProgressVideoWatch.objects.update_or_create(user=request.user,
                                                                    video=video, defaults=values_for_update)
-        print(created)
-        print(obj.time)
-        print("##########")
         video = Video.objects.filter(pk=obj.video.pk).first()
-        serialized = VideoSerializer(video, context={'time': time_per_seconds, 'user': request.user})
+        serialized = VideoSerializer(video, context={'user': request.user})
         return Response(serialized.data, status=202)
 
 
@@ -369,6 +357,5 @@ class LastWatchVideoView(APIView):
     def get(self, request: Request):
         video_id = LastWatchVideo.objects.filter(user=request.user).values_list('id', flat=True).first()
         video = Video.objects.filter(pk=video_id).first()
-        time = ProgressVideoWatch.objects.filter(video=video, user=request.user).values_list('id', flat=True).first()
-        serialized = VideoSerializer(video, context={'time': time, 'user': request.user})
+        serialized = VideoSerializer(video, context={'user': request.user})
         return Response(serialized.data, status=200)

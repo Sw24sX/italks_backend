@@ -10,17 +10,26 @@ from django.contrib.auth import password_validation
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 
-from ..models import UserSettings
-from ..serializers.UserSerializer import UserSettingsSerializer, UserSerializer, UserDataSettingsSerializer
+from ..models import UserSettings, LastWatchVideo, Video
+from ..serializers.UserSerializer import UserSettingsSerializer,  UserInfoSerializer
 
 
 class CheckToken(APIView):
     """Проверка на актуальность токена + информация о пользователе"""
+
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-
-        return Response(status=200)
+        video_id = LastWatchVideo.objects.filter(user=request.user)\
+            .values_list('id', flat=True)\
+            .first()
+        context = {}
+        if video_id is not None:
+            video = Video.objects.get(pk=video_id)
+            context['last_video'] = video
+        LastWatchVideo
+        serialized = UserInfoSerializer(request.user, context=context)
+        return Response(serialized.data, status=200)
 
 
 class UserSettingsInput:
@@ -28,6 +37,7 @@ class UserSettingsInput:
     new_password: str = None
     old_password: str = None
     request: Request = None
+    errors: dict = {}
 
     def __init__(self, request: Request):
         data = request.data
@@ -40,14 +50,12 @@ class UserSettingsInput:
             self.old_password = data['old_password']
         self.request = request
 
-
-    def update_user_data(self) -> dict:
-        errors = {}
+    def update_without_save_user_data(self) -> bool:
         user = self.request.user
         if self._username_is_change():
             reg = re.compile('[^a-z0-9_]')
             if len(reg.sub('', self.username)) != len(self.username):
-                errors['username'] = 'Имя не может содержать спецсимволы'
+                self.errors['username'] = 'Имя не может содержать спецсимволы'
             else:
                 user.username = self.username
 
@@ -56,15 +64,13 @@ class UserSettingsInput:
                 try:
                     password_validation.validate_password(self.new_password, user=self.request.user)
                 except ValidationError as err:
-                    errors['new_password'] = err.messages[0]
+                    self.errors['new_password'] = err.messages[0]
                 else:
                     user.set_password(self.new_password)
             else:
-                errors['old_password'] = 'Старый пароль не верный'
-        if len(errors) == 0:
-            user.save()
-        return errors
+                self.errors['old_password'] = 'Старый пароль не верный'
 
+        return len(self.errors) == 0
 
     def _username_is_change(self) -> bool:
         return self.username is not None and self.request.user.username != self.username
@@ -96,15 +102,11 @@ class UserSettingsView(APIView):
         except ValueError:
             return Response(status=400)
 
-        #if user_settings.email_is_change():
-        #    # todo send email
-        #    pass
-
-        errors = user_settings.update_user_data()
-        if len(errors) != 0:
+        updated = user_settings.update_without_save_user_data()
+        if not updated:
             data = {
                 'info_user': {'username': request.user.username},
-                'errors': errors,
+                'errors': user_settings.errors,
             }
             return Response(data, status=400)
 
@@ -115,7 +117,7 @@ class UserSettingsView(APIView):
 
 
 class OtherSettingsView(APIView):
-    """todo"""
+    """Изменение всех флагов"""
 
     permission_classes = [permissions.IsAuthenticated]
 
@@ -131,14 +133,10 @@ class OtherSettingsView(APIView):
         if dark_theme is not None:
             dark_theme = self._str_to_bool(dark_theme)
             values_for_update['dark_theme'] = dark_theme
-            #if not dark_theme:
-            #    values_for_update['as_device'] = False
 
         as_device = request.query_params.get('as_device', None)
         if as_device is not None:
             as_device = self._str_to_bool(as_device)
-            #if as_device and ((dark_theme is not None and not dark_theme) or not settings.dark_theme):
-            #    return Response(status=400)
 
             values_for_update['as_device'] = as_device
 

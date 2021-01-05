@@ -6,7 +6,7 @@ from django.core.paginator import Paginator, EmptyPage
 
 from ..models import FavouritesVideos, Video, User, FavoritesCategory, Category, Subcategory, FavoritesSubcategory
 
-from ..serializers.VideoSerializer import VideoSerializer
+from ..serializers.VideoSerializers import VideoSerializer
 from ..serializers.CategorySerializer import CategorySerializer, SubcategoriesSerializer
 
 
@@ -62,17 +62,15 @@ class AddFavoritesVideoView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request: Request, video_id: int):
-        print('i am here')
         video = Video.objects.filter(pk=video_id)
         if video.first() is None:
-            print('video error')
             return Response(status=400)
 
         user = request.user
         try:
             FavouritesVideos.objects.create(user=user, video=video.first()).save()
+            # todo обработка ошибок
         except:
-            print(1)
             return Response({'error': "Video has already been added"}, status=400)
 
         serialized = VideoSerializer(video, many=True, context={'user': request.user})

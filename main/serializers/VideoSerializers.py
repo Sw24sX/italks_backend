@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
-from ..models import Video, Category, Author, Resource, FavouritesVideos, LastWatchVideo
+from ..models import Video, Category, Author, Resource, FavouritesVideos, LastWatchVideo, ProgressVideoWatch
 from ..serializers.CategorySerializer import CategorySerializer, SubcategorySerializer
-from ..serializers.UserSerializer import UserSerializer
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -32,27 +31,20 @@ class VideoSerializer(serializers.ModelSerializer):
             if not user.is_anonymous:
                 representation['is_favorite'] = FavouritesVideos.objects.filter(user=user, video=instance).exists()
 
-        if 'time' in self.context:
-            time = self.context['time']
+            time = ProgressVideoWatch.objects \
+                .filter(user=user, video=instance) \
+                .values_list('time', flat=True) \
+                .first()
+            if time is None:
+                time = 0
             representation['time'] = time
+        #if 'time' in self.context:
+        #    time = self.context['time']
+        #    representation['time'] = time
 
         return representation
 
     class Meta:
         model = Video
         fields = "__all__"
-
-
-class SearchResultSerializer(serializers.Serializer):
-    result = VideoSerializer(many=True)
-
-
-class LastVideoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LastWatchVideo
-        fields = ('video',)
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        video = instance.video
 
