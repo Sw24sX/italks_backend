@@ -133,14 +133,14 @@ class OtherSettingsView(APIView):
         if dark_theme is not None:
             dark_theme = self._str_to_bool(dark_theme)
             values_for_update['dark_theme'] = dark_theme
-            if not dark_theme:
-                values_for_update['as_device'] = False
+            #if not dark_theme:
+            #    values_for_update['as_device'] = False
 
         as_device = request.query_params.get('as_device', None)
         if as_device is not None:
             as_device = self._str_to_bool(as_device)
-            if as_device and ((dark_theme is not None and not dark_theme) or not settings.dark_theme):
-                return Response(status=400)
+            #if as_device and ((dark_theme is not None and not dark_theme) or not settings.dark_theme):
+            #    return Response(status=400)
 
             values_for_update['as_device'] = as_device
 
