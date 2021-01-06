@@ -44,7 +44,10 @@ urlpatterns = [
     path('settings/dark_theme/<int:is_dark_theme>/', UserView.DarkThemeSettingsView.as_view()),  # Изменение флага "темная тема"
     path('settings/as_device/<int:is_as_device>/', UserView.AsDeviceSettingsView.as_view()),  # Изменение флага "как на устройстве"
 
-    path('notifications/', NotificationsViews.GetNotificationsViews.as_view()),
+    path('notifications/', NotificationsViews.NotificationsViews.as_view()),
+    path('notifications/list/', NotificationsViews.GetNotificationsViews.as_view()),
+    path('notifications/count/', NotificationsViews.GetCountNotificationsViews.as_view()),
+    path('notifications/mark_read/', NotificationsViews.MarkAsReadNotificationsView.as_view()),
 
     path('test/', TestViews.TestViews.as_view()),
 
