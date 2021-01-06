@@ -17,7 +17,7 @@ class GetNotificationsViews(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request: Request):
-        notifications = Notifications.objects.filter(user=request.user)
+        notifications = Notifications.objects.filter(user=request.user)[:30]
         serialized = NotificationsSerializer(notifications, many=True)
         return Response(serialized.data, status=200)
 
@@ -41,7 +41,7 @@ class NotificationsViews(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request: Request):
-        notifications = Notifications.objects.filter(user=request.user)
+        notifications = Notifications.objects.filter(user=request.user)[:30]
         serialized = NotificationsSerializer(notifications, many=True)
         data = {
             'count': notifications.count(),
@@ -65,7 +65,6 @@ class MarkAsReadNotificationsView(APIView):
             notifications = notifications.filter(pk__gte=from_id)
         if to_id is not None:
             notifications = notifications.filter(pk__lte=to_id)
-
         serialised = NotificationsSerializer(notifications, many=True).data
         notifications.delete()
         return Response(serialised, status=200)

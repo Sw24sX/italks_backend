@@ -20,9 +20,9 @@ class TestViews(APIView):
     def post(self, request):
         user = request.user
         res = []
-        for i in range(1, 11):
+        for i in range(5, 11):
             video = Video.objects.get(pk=i)
-            res.append(Notifications.objects.create(user=user, video=video, data=datetime.now()).save())
+            res.append(Notifications.objects.create(user=user, video=video, date=datetime.now()).save())
 
         serial = NotificationsSerializer.NotificationsSerializer(res).data
         return Response(serial, status=201)
