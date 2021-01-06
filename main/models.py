@@ -200,9 +200,9 @@ class LastWatchVideo(models.Model):
 class Notifications(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
-    data = models.DateField()
+    date = models.DateField()
 
     class Meta:
         db_table = "Notifications"
         unique_together = ('user', 'video')
-        ordering = ['data']
+        ordering = ['date']

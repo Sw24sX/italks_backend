@@ -39,7 +39,7 @@ class VideoCreateView(APIView):
     def post(self, request):
         # todo not implemented
 
-        serializer = VideoSerializer(data=request.data, context={'user': request.user})
+        serializer = VideoSerializer(data=request.date, context={'user': request.user})
         if not serializer.is_valid():
             return Response(status=400)
 

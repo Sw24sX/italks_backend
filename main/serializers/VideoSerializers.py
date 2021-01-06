@@ -38,9 +38,6 @@ class VideoSerializer(serializers.ModelSerializer):
             if time is None:
                 time = 0
             representation['time'] = time
-        #if 'time' in self.context:
-        #    time = self.context['time']
-        #    representation['time'] = time
 
         return representation
 

@@ -1,6 +1,7 @@
 from django.urls import path, include
 
-from .views import (CategoryViews, SearchViews, FavoritesViews, UserView, TestViews, VideoViews, UpcomingEventViews)
+from .views import (CategoryViews, SearchViews, FavoritesViews, UserView, TestViews,
+                    VideoViews, UpcomingEventViews, NotificationsViews)
 
 
 urlpatterns = [
@@ -42,6 +43,8 @@ urlpatterns = [
     path('settings/notification/<int:is_notification>/', UserView.NotificationsSettingsView.as_view()),  # Изменение флага "получать уведомления"
     path('settings/dark_theme/<int:is_dark_theme>/', UserView.DarkThemeSettingsView.as_view()),  # Изменение флага "темная тема"
     path('settings/as_device/<int:is_as_device>/', UserView.AsDeviceSettingsView.as_view()),  # Изменение флага "как на устройстве"
+
+    path('notifications/', NotificationsViews.GetNotificationsViews.as_view()),
 
     path('test/', TestViews.TestViews.as_view()),
 

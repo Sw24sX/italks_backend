@@ -7,8 +7,8 @@ from rest_framework import generics, permissions
 from django.core.mail import send_mail
 from django.conf import settings
 from djoser import email
-from ..models import Category, Subcategory, Video, CategoryNames, SubcategoryNames, LastWatchVideo
-from ..serializers import TestSerializer, VideoSerializers
+from ..models import Category, Subcategory, Video, CategoryNames, SubcategoryNames, LastWatchVideo, Notifications
+from ..serializers import TestSerializer, VideoSerializers, NotificationsSerializer
 from django.db.models import Q
 import random
 import json
@@ -18,14 +18,14 @@ class TestViews(APIView):
     """Тест"""
 
     def post(self, request):
-        password = request.data['new_password']
         user = request.user
-        user.set_password(password)
-        user.save()
-        #data = LastWatchVideo.objects.filter(user=request.user, video_id=3).first()
-        #print(data)
-        #serialized = VideoSerializers.LastVideoSerializer(data)
-        return Response( status=201)
+        res = []
+        for i in range(1, 11):
+            video = Video.objects.get(pk=i)
+            res.append(Notifications.objects.create(user=user, video=video, data=datetime.now()).save())
+
+        serial = NotificationsSerializer.NotificationsSerializer(res).data
+        return Response(serial, status=201)
 
     def fill_videos(self):
         videos = Video.objects.filter(pk__gte=30)

@@ -24,7 +24,7 @@ class CategoryCreateView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        serializer = CategorySerializer(data=request.data)
+        serializer = CategorySerializer(data=request.date)
         if not serializer.is_valid():
             return Response(serializer.data, status=400)
 
@@ -57,7 +57,7 @@ class SubcategoryCreateView(APIView):
         if category is None:
             return Response(status=400)
 
-        serializer = SubcategorySerializer(data=request.data)
+        serializer = SubcategorySerializer(data=request.date)
         if not serializer.is_valid():
             return Response(serializer.data, status=400)
 
