@@ -21,13 +21,12 @@ class CheckToken(APIView):
 
     def get(self, request):
         video_id = LastWatchVideo.objects.filter(user=request.user)\
-            .values_list('id', flat=True)\
+            .values_list('video_id', flat=True)\
             .first()
         context = {}
         if video_id is not None:
             video = Video.objects.get(pk=video_id)
             context['last_video'] = video
-        LastWatchVideo
         serialized = UserInfoSerializer(request.user, context=context)
         return Response(serialized.data, status=200)
 
