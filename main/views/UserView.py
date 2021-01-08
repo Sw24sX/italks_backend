@@ -36,7 +36,7 @@ class UserSettingsInput:
     new_password: str = None
     old_password: str = None
     request: Request = None
-    errors: dict = {}
+    errors: dict = None
 
     def __init__(self, request: Request):
         data = request.data
@@ -47,6 +47,7 @@ class UserSettingsInput:
             self.new_password = data['new_password']
         if 'old_password' in data:
             self.old_password = data['old_password']
+        self.errors = {}
         self.request = request
 
     def update_without_save_user_data(self) -> bool:
@@ -70,6 +71,9 @@ class UserSettingsInput:
                 self.errors['old_password'] = 'Старый пароль не верный'
 
         return len(self.errors) == 0
+
+    def save(self):
+        self.request.user.save()
 
     def _username_is_change(self) -> bool:
         return self.username is not None and self.request.user.username != self.username
@@ -108,6 +112,8 @@ class UserSettingsView(APIView):
                 'errors': user_settings.errors,
             }
             return Response(data, status=400)
+        else:
+            user_settings.save()
 
         data = {
             'info_user': {'username': request.user.username},
