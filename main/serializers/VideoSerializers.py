@@ -28,15 +28,16 @@ class VideoSerializer(serializers.ModelSerializer):
         representation['is_favorite'] = False
         if 'user' in self.context:
             user = self.context['user']
+            time = 0
             if not user.is_anonymous:
                 representation['is_favorite'] = FavouritesVideos.objects.filter(user=user, video=instance).exists()
 
-            time = ProgressVideoWatch.objects \
-                .filter(user=user, video=instance) \
-                .values_list('time', flat=True) \
-                .first()
-            if time is None:
-                time = 0
+                time = ProgressVideoWatch.objects \
+                    .filter(user=user, video=instance) \
+                    .values_list('time', flat=True) \
+                    .first()
+                if time is None:
+                    time = 0
             representation['time'] = time
 
         return representation

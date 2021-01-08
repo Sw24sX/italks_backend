@@ -286,6 +286,8 @@ class VideosViews(APIView):
 class SimilarVideosViews(APIView):
     """Список похожих видео"""
 
+    permission_classes = [permissions.AllowAny]
+
     def get(self, request, video_src):
         # todo запоминать данные о видео, его категорию и тд
         video = Video.objects.filter(src=video_src).first()

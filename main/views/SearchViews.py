@@ -17,10 +17,10 @@ class Search(APIView):
         if search_request is None:
             return Response(status=400)
         list_search = [i.lower() for i in search_request.split()]
-        #videos_by_category = self._get_videos_by_categories(list_search)
-        #videos_by_subcategory = self._get_videos_by_subcategories(list_search)
+        videos_by_category = self._get_videos_by_categories(list_search)
+        videos_by_subcategory = self._get_videos_by_subcategories(list_search)
         videos_by_name = self._get_videos_by_name(search_request)
-        #videos = videos_by_category.union(videos_by_subcategory, videos_by_name)
+        videos = videos_by_category.union(videos_by_subcategory, videos_by_name)
         page = request.query_params.get('page')
         page_size = request.query_params.get('page_size')
         if page_size is None:
@@ -31,11 +31,13 @@ class Search(APIView):
             order_by = "-date"
         elif order_by == "old_date":
             order_by = "date"
-        videos = videos_by_name.order_by(order_by)
+        videos = videos.order_by(order_by)
 
         videos, paginator = self.get_videos_page(videos, page, page_size)
-
-        serialized = VideoSerializer(videos, many=True, context={'user': request.user})
+        context = {}
+        if not request.user.is_anonymous:
+            context = {'user': request.user}
+        serialized = VideoSerializer(videos, many=True, context=context)
         data = {
             "is_last_page": int(page) == paginator.num_pages,
             "number_pages": paginator.num_pages,
