@@ -252,18 +252,18 @@ class VideosViews(APIView):
         videos = Video.objects.all()
         if period == "year":
             # ONLY FOR DEV
-            pk_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            pk_list = [i for i in range(41, 60)]
             videos = videos.filter(pk__in=pk_list)
             #videos = videos.filter(date__lt=self.get_date_start_current_month()) \
             #    .filter(date__gte=self.get_date_start_current_year())
         elif period == "month":
-            pk_list = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+            pk_list = [i for i in range(21, 41)]
             videos = videos.filter(pk__in=pk_list)
             #videos = videos.filter(date__lt=self.get_date_start_week()) \
             #    .filter(date__gte=self.get_date_start_current_month())
         elif period == "week":
-            #pk_list = [i for i in range(1, 122)]
-            videos = Video.objects.all()
+            pk_list = [i for i in range(1, 21)]
+            videos = videos.filter(pk__in=pk_list)
             #videos = videos.filter(date__gte=self.get_date_start_week())
         return videos
 
